@@ -30,21 +30,11 @@ from twilio.rest import Client
 from werkzeug.utils import secure_filename
 from .models import (
     User,
-    #UserContact,
     #UserInfo,
-    #UserLocation,
-    #PasswordReset,
-    #Card,
 )
 from .serializers import (
     UserSerializer,
     #UserInfoSerializer,
-    #BuyerAddInfoSerializer,
-    #RiderAddInfoSerializer,
-    #UpdatePhotoSerializer,
-    #UserLocationSerializer,
-    #UserContactSerializer,
-    #CardSerializer,
 )
 
 

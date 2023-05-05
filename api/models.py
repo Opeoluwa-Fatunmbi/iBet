@@ -10,8 +10,6 @@ class User(AbstractUser):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
-    # USERNAME_FIELD = 'username'
-    # REQUIRED_FIELDS = ['email']
 
 class UserInfo(models.Model):
 
@@ -22,7 +20,7 @@ class UserInfo(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_info")
     fullname = models.CharField(max_length=100, blank=True)
     account_type = models.CharField(choices=ACCOUNT_TYPE_CHOICES, max_length=5)
-    profile_photo = models.ImageField(upload_to="profile_photo", blank=True, null=True)
+    profile_photo = models.ImageField(upload_to="profile_photo", blank=True, null=True) #Use Cloudinary here
     dob = models.DateField()
     
     def __str__(self):

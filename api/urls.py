@@ -4,14 +4,8 @@ from .views import (
     Login,
     #AddInfo,
     #UpdateInfo,
-    #UpdateAddress,
     #ForgotPassword,
-    #CreateContact,
-    #UpdateContact,
-    #AddToCart,
-    #ProductDetails,
     Logout,
-    #AddNewCard,
 )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
@@ -27,8 +21,6 @@ urlpatterns = [
     #path('user/createcontact/', CreateContact.as_view(), name='create_contact'),
     #path('user/updatecontact/', UpdateContact.as_view(), name='update_contact'),
     
-    # PRODUCT
-    #path('productdetails/', ProductDetails.as_view(), name="product_details"),
     #path('addnewcard/', AddNewCard.as_view(), name='add_new_card'),
 
 
