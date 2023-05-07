@@ -1,1 +1,3 @@
 # iBet
+
+iBet: a betting platform API leveraging iMessage games. Developed with Django Rest Framework (DRF), iBet allows users to sign up, compete against each other, and choose the amount they want to stake on preferred games. Designed with a mediator to ensure fair play and a 10% cut from the winner's stake for platform maintenance. Collaborated with a team of developers to create a scalable and robust API.
