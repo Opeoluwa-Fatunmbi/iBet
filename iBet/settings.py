@@ -194,6 +194,8 @@ REST_FRAMEWORK = {
     # ),
 }
 
+
+
 # EMAIL
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = '<smtp.yourserver.com>' # 'smtp.gmail.com'
