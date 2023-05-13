@@ -1,30 +1,19 @@
-import datetime
-import os
-import random
-import re
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from django.contrib.auth import (
-    authenticate,
-    login,
-    logout,
-)
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.db import IntegrityError
-from rest_framework.authentication import BasicAuthentication, SessionAuthentication
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import AllowAny
 from .models import (
     User,
     Game, 
@@ -41,26 +30,28 @@ from .serializers import (
 
 
 # ------Create user------#
-class UserCreate(APIView):
+class Signup(APIView):
+    #-------Authentication-----#
+    permission_classes = [AllowAny]
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             try:
                 user = serializer.save()
-
+                #------Login User------#
+                login(request, user)
                 #------create tokens for the user------#
                 tokens = TokenObtainPairSerializer().validate(request.data)
                 access_token = tokens['access']
                 refresh_token = tokens['refresh']
-                #expires_in = tokens['access_token_lifetime']
+
                 #------serialize the response------#
                 data = {
                     'access_token': access_token,
                     'refresh_token': refresh_token,
                 }
   
-                    #------Login User------#
-                login(request, user)
+
                 return Response(data, status=status.HTTP_201_CREATED)
             except IntegrityError:
                 return Response({'error': 'User with this email or username already exists.'}, status=status.HTTP_409_CONFLICT)
