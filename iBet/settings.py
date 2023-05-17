@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     #Third-party apps
     'rest_framework',
     'rest_framework_simplejwt',
+    'debug_toolbar',
 
     #Custom apps
     'api',
@@ -57,9 +58,30 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
+    #----ThirdParty Middlewares----#
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+
     #-------CustomMiddleware-------#
     'api.middleware.SessionTimeoutMiddleware',
 ]
+
+DEBUG_TOOLBAR_ENABLED = True
+
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_WHEN_DEBUG': True,
+    'EXTRA_CONTEXT': {
+        'debug': True,
+    },
+}
+
+INTERNAL_IPS = [
+    # ...
+    '127.0.0.1',
+    # ...
+]
+
+
+
 
 ROOT_URLCONF = 'iBet.urls'
 
