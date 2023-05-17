@@ -6,14 +6,9 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.mail import send_mail
 from django.db import IntegrityError
-from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.permissions import AllowAny
 from .models import (
     User,
     Game, 
@@ -41,10 +36,9 @@ class Signup(APIView):
                 #------Login User------#
                 login(request, user)
                 #------create tokens for the user------#
-                tokens = TokenObtainPairSerializer().validate(request.data)
-                access_token = tokens['access']
-                refresh_token = tokens['refresh']
-
+                refresh = RefreshToken.for_user(user)
+                access_token = str(refresh.access_token)
+                refresh_token = str(refresh)
                 #------serialize the response------#
                 data = {
                     'access_token': access_token,
@@ -59,6 +53,10 @@ class Signup(APIView):
 
 # ------Log user in------#
 class Login(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request):
         username = request.data.get("username")
         password = request.data.get("password")

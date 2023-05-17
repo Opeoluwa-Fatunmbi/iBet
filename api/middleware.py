@@ -11,7 +11,7 @@ class SessionTimeoutMiddleware:
             last_activity = request.session.get('last_activity', None)
             if last_activity:
                 last_activity = datetime.datetime.strptime(last_activity, '%Y-%m-%d %H:%M:%S')
-                if (datetime.datetime.now() - last_activity).seconds > 3600: # 1hr = timeout duration
+                if (datetime.datetime.now() - last_activity).seconds > 10800: # 1hr = timeout duration
                     logout(request)
             request.session['last_activity'] = current_time
         response = self.get_response(request)
