@@ -1,0 +1,8 @@
+.env
+development.py
+migrations/
+
+
+__pycache__
+*.sqlite3
+*.pyc

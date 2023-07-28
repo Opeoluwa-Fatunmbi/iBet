@@ -1,0 +1,15 @@
+asgiref==3.7.2
+Django==4.2.3
+django-debug-toolbar==4.1.0
+django-rest-auth==0.9.5
+djangorestframework==3.14.0
+djangorestframework-api-key==2.3.0
+djangorestframework-jwt==1.11.0
+djangorestframework-simplejwt==5.2.2
+PyJWT==1.7.1
+python-dotenv==1.0.0
+pytz==2023.3
+six==1.16.0
+sqlparse==0.4.4
+typing_extensions==4.7.1
+tzdata==2023.3
