@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     #Third-Party Apps
     'allauth',
     'allauth.account',
-    'allauth.socialaccount',
+    #'allauth.socialaccount',
     'drf_yasg',
     'dj_rest_auth',
     'dj_rest_auth.registration',
@@ -90,8 +90,10 @@ WSGI_APPLICATION = 'iBet.wsgi.application'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
+    #'allauth.account.auth_backends.AuthenticationBackend',
 ]
+
+
 
 
 SITE_ID = 1
@@ -146,7 +148,7 @@ REST_FRAMEWORK = {
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        #'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
     ),
 
     'DEFAULT_THROTTLE_CLASSES': [
@@ -182,8 +184,8 @@ REST_USE_JWT = True
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    "ROTATE_REFRESH_TOKENS": False,
-    "BLACKLIST_AFTER_ROTATION": False,
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
     "UPDATE_LAST_LOGIN": False,
 
     "ALGORITHM": "HS256",
@@ -243,7 +245,7 @@ REST_AUTH = {
     'OLD_PASSWORD_FIELD_ENABLED': False,
     'LOGOUT_ON_PASSWORD_CHANGE': False,
     'SESSION_LOGIN': True,
-    'USE_JWT': False,
+    'USE_JWT': True,
 
     'JWT_AUTH_COOKIE': None,
     'JWT_AUTH_REFRESH_COOKIE': None,
