@@ -1,8 +1,176 @@
 .env
-development.py
+local.py
 migrations/
 
 
 __pycache__
 *.sqlite3
 *.pyc
+
+
+# Compiled Python files
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+env/
+*.env
+
+# Local development settings
+*.sqlite3
+*.db
+*.log
+
+# Media and static files
+media/
+static/
+
+# Compiled files
+*.pyc
+*.class
+
+# Dependency folders
+node_modules/
+bower_components/
+
+# macOS files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor-specific files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Compiled Java classes
+*.class
+
+# Compiled Ruby files
+*.rbc
+
+# Compiled PHP files
+*.php[cods]
+
+# Windows thumbnail cache files
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+
+# Windows Desktop.ini files
+Desktop.ini
+
+# Windows Recycle Bin
+$RECYCLE.BIN/
+
+# Python venv (virtual environment)
+__pycache__/
+pyvenv.cfg
+venv/
+*.py[cod]
+
+# macOS temporary files
+.AppleDouble
+.DS_Store
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Compiled Python files
+*.pyc
+
+# Python development
+__pycache__/
+*.pyc
+*.pyo
+__pycache__/
+*.egg-info/
+dist/
+build/
+*.log
+
+# IDE specific
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw*
+
+# Compiled C++ files
+*.out
+
+# Virtual environment
+env/
+venv/
+
+# Compiled Java classes
+*.class
+
+# Compiled LaTeX files
+*.dvi
+*.pdf
+
+# Compiled Ruby files
+*.rbc
+
+# Compiled Python files
+__pycache__/
+*.pyc
+*.pyo
+
+# Compiled Java files
+*.class
+
+# Temporary files
+*.log
+*.bak
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# PyCharm settings
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Eclipse settings
+.classpath
+.project
+.settings/
+
+# Visual Studio Code settings
+.vscode/

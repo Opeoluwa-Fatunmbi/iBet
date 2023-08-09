@@ -2,8 +2,15 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 from datetime import timedelta
-
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 load_dotenv()
+
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -11,11 +18,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+#ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -27,36 +33,34 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'django.contrib.sites',
 
+    # Third-Party Apps
 
-    #Third-Party Apps
     'allauth',
     'allauth.account',
-    #'allauth.socialaccount',
+    # 'allauth.socialaccount',
+    'cloudinary',
+    "corsheaders",
     'drf_yasg',
     'dj_rest_auth',
     'dj_rest_auth.registration',
+    # "django_toolbar",
     'rest_framework',
-    #'rest_auth',
-    #'rest_auth.registration',
     'rest_framework_jwt',
     'rest_framework.authtoken',
     'rest_framework_simplejwt.token_blacklist',
 
 
-    #"django_toolbar",
-
-    #Custom
+    # Custom Apps
     "core",
-
 
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -97,6 +101,14 @@ AUTHENTICATION_BACKENDS = [
 
 
 SITE_ID = 1
+
+
+cloudinary.config( 
+  cloud_name = os.environ.get('cloud_name'), 
+  api_key = os.environ.get('api_key'), 
+  api_secret = os.environ.get('api_secret'),
+  secure = True
+)
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -139,7 +151,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
+AUTH_USER_MODEL = 'core.User' 
 REST_USE_JWT = True
 
 
@@ -175,6 +187,15 @@ REST_AUTH = {
     'JWT_AUTH_COOKIE': 'my-app-auth',
     'JWT_AUTH_REFRESH_COOKIE': 'my-refresh-token',
 }
+
+
+# SENTRY SETTINGS
+
+sentry_sdk.init(
+    dsn=os.environ.get('SENTRY_DSN'),
+    integrations=[DjangoIntegration()],
+    traces_sample_rate=1.0
+)
 
 
 
@@ -257,3 +278,27 @@ REST_AUTH = {
     'JWT_AUTH_COOKIE_USE_CSRF': False,
     'JWT_AUTH_COOKIE_ENFORCE_CSRF_ON_UNAUTHENTICATED': False,
 }
+
+
+# cors settings
+CORS_ALLOW_ALL_ORIGINS = False # If this is used then `CORS_ALLOWED_ORIGINS` will not have any effect
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:3000',  # for localhost (REACT Default)
+    'http://192.168.0.50:3000',  # for network 
+    'http://127.0.0.1:8000/',  # for localhost (Local)
+    'http://192.168.0.50:8080',  # for network (Development)
+)
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',  # for localhost (REACT Default)
+    'http://192.168.0.50:3000',  # for network 
+    'http://127.0.0.1:8000/',  # for localhost (Local)
+    'http://192.168.0.50:8080',  # for network (Development)
+] # If this is used, then not need to use `CORS_ALLOW_ALL_ORIGINS = True`
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    'http://localhost:3000',  # for localhost (REACT Default)
+    'http://192.168.0.50:3000',  # for network 
+    'http://127.0.0.1:8000/',  # for localhost (Local)
+    'http://192.168.0.50:8080',  # for network (Development)
+]

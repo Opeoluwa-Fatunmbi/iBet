@@ -9,7 +9,7 @@ def main():
     """Run administrative tasks."""
 
     if base.DEBUG:
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'iBet.settings.development')
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'iBet.settings.local')
     else:
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'iBet.settings.production')
 
