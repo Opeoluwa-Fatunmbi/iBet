@@ -5,8 +5,6 @@ from datetime import timedelta
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
 load_dotenv()
 
 
@@ -21,12 +19,10 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-#ALLOWED_HOSTS = ["*"]
-
+# ALLOWED_HOSTS = ["*"]
 
 # Application definition
-
-INSTALLED_APPS = [
+DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -34,9 +30,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+]
 
-    # Third-Party Apps
 
+THIRD_PARTY_APPS = [
     'allauth',
     'allauth.account',
     # 'allauth.socialaccount',
@@ -50,12 +47,13 @@ INSTALLED_APPS = [
     'rest_framework_jwt',
     'rest_framework.authtoken',
     'rest_framework_simplejwt.token_blacklist',
-
-
-    # Custom Apps
-    "core",
-
 ]
+
+LOCAL_APPS = [
+    "core",
+]
+
+INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -90,19 +88,14 @@ TEMPLATES = [
 WSGI_APPLICATION = 'iBet.wsgi.application'
 
 
-
-
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     #'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-
-
-
 SITE_ID = 1
 
-
+# CLOUDINARY
 cloudinary.config( 
   cloud_name = os.environ.get('cloud_name'), 
   api_key = os.environ.get('api_key'), 
@@ -188,7 +181,7 @@ REST_AUTH = {
     'JWT_AUTH_REFRESH_COOKIE': 'my-refresh-token',
 }
 
-
+'''
 # SENTRY SETTINGS
 
 sentry_sdk.init(
@@ -196,7 +189,7 @@ sentry_sdk.init(
     integrations=[DjangoIntegration()],
     traces_sample_rate=1.0
 )
-
+'''
 
 
 #JWT SETTINGS
@@ -280,9 +273,14 @@ REST_AUTH = {
 }
 
 
+
+
 # cors settings
-CORS_ALLOW_ALL_ORIGINS = False # If this is used then `CORS_ALLOWED_ORIGINS` will not have any effect
+CORS_ALLOW_ALL_ORIGINS = True # If this is used then `CORS_ALLOWED_ORIGINS` will not have any effect
+
 CORS_ALLOW_CREDENTIALS = True
+
+
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:3000',  # for localhost (REACT Default)
     'http://192.168.0.50:3000',  # for network 
