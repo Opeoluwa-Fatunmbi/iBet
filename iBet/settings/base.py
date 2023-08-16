@@ -32,28 +32,27 @@ DJANGO_APPS = [
     'django.contrib.sites',
 ]
 
-
 THIRD_PARTY_APPS = [
     'allauth',
     'allauth.account',
-    # 'allauth.socialaccount',
     'cloudinary',
-    "corsheaders",
     'drf_yasg',
     'dj_rest_auth',
     'dj_rest_auth.registration',
-    # "django_toolbar",
     'rest_framework',
     'rest_framework_jwt',
     'rest_framework.authtoken',
     'rest_framework_simplejwt.token_blacklist',
+    # 'allauth.socialaccount',
+    # "django_toolbar",
 ]
 
 LOCAL_APPS = [
     "core",
 ]
 
-INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -272,31 +271,3 @@ REST_AUTH = {
     'JWT_AUTH_COOKIE_ENFORCE_CSRF_ON_UNAUTHENTICATED': False,
 }
 
-
-
-
-# cors settings
-CORS_ALLOW_ALL_ORIGINS = True # If this is used then `CORS_ALLOWED_ORIGINS` will not have any effect
-
-CORS_ALLOW_CREDENTIALS = True
-
-
-CORS_ORIGIN_WHITELIST = (
-    'http://localhost:3000',  # for localhost (REACT Default)
-    'http://192.168.0.50:3000',  # for network 
-    'http://127.0.0.1:8000/',  # for localhost (Local)
-    'http://192.168.0.50:8080',  # for network (Development)
-)
-
-CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:3000',  # for localhost (REACT Default)
-    'http://192.168.0.50:3000',  # for network 
-    'http://127.0.0.1:8000/',  # for localhost (Local)
-    'http://192.168.0.50:8080',  # for network (Development)
-] # If this is used, then not need to use `CORS_ALLOW_ALL_ORIGINS = True`
-CORS_ALLOWED_ORIGIN_REGEXES = [
-    'http://localhost:3000',  # for localhost (REACT Default)
-    'http://192.168.0.50:3000',  # for network 
-    'http://127.0.0.1:8000/',  # for localhost (Local)
-    'http://192.168.0.50:8080',  # for network (Development)
-]
