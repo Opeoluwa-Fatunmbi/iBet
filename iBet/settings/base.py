@@ -1,23 +1,23 @@
 import os
 from pathlib import Path
-from dotenv import load_dotenv
 from datetime import timedelta
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
-load_dotenv()
+from decouple import config
 
 
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = config("SECRET_KEY")
+
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+
 
 # ALLOWED_HOSTS = ["*"]
 
@@ -57,7 +57,6 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -87,6 +86,16 @@ TEMPLATES = [
 WSGI_APPLICATION = 'iBet.wsgi.application'
 
 
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+
+
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     #'allauth.account.auth_backends.AuthenticationBackend',
@@ -96,9 +105,9 @@ SITE_ID = 1
 
 # CLOUDINARY
 cloudinary.config( 
-  cloud_name = os.environ.get('cloud_name'), 
-  api_key = os.environ.get('api_key'), 
-  api_secret = os.environ.get('api_secret'),
+  cloud_name =config('cloud_name'), 
+  api_key =config('api_key'), 
+  api_secret =config('api_secret'),
   secure = True
 )
 
@@ -180,15 +189,6 @@ REST_AUTH = {
     'JWT_AUTH_REFRESH_COOKIE': 'my-refresh-token',
 }
 
-'''
-# SENTRY SETTINGS
-
-sentry_sdk.init(
-    dsn=os.environ.get('SENTRY_DSN'),
-    integrations=[DjangoIntegration()],
-    traces_sample_rate=1.0
-)
-'''
 
 
 #JWT SETTINGS
@@ -202,7 +202,7 @@ SIMPLE_JWT = {
     "UPDATE_LAST_LOGIN": False,
 
     "ALGORITHM": "HS256",
-    "SIGNING_KEY": os.environ.get("SECRET_KEY"),
+    "SIGNING_KEY":config("SECRET_KEY"),
     "VERIFYING_KEY": "",
     "AUDIENCE": None,
     "ISSUER": None,
@@ -258,7 +258,7 @@ REST_AUTH = {
     'OLD_PASSWORD_FIELD_ENABLED': False,
     'LOGOUT_ON_PASSWORD_CHANGE': False,
     'SESSION_LOGIN': True,
-    'USE_JWT': True,
+    'USE_JWT': True, #VERY IMPORTANT IF YOU WANT TO USE JWT
 
     'JWT_AUTH_COOKIE': None,
     'JWT_AUTH_REFRESH_COOKIE': None,

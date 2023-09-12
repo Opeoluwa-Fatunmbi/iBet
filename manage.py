@@ -2,16 +2,16 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
-from iBet.settings import base
+from decouple import config
 
+SETTINGS = config("SETTINGS")
 
 def main():
     """Run administrative tasks."""
 
-    if base.DEBUG:
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'iBet.settings.local')
-    else:
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'iBet.settings.production')
+
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', f'iBet.settings.{SETTINGS}')
+
 
 
     try:

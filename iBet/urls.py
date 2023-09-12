@@ -24,6 +24,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    #path('admin/', include("admin.urls")),
     path('', include('core.urls')), 
     path('accounts/', include('allauth.urls')),
     path('dj-rest-auth/', include('dj_rest_auth.urls')),

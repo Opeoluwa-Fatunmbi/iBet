@@ -8,9 +8,13 @@ https://docs.djangoproject.com/en/4.2/howto/deployment/wsgi/
 """
 
 import os
+from decouple import config
+
+SETTINGS = config("SETTINGS")
+
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'iBet.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', f'iBet.settings.{SETTINGS}')
 
 application = get_wsgi_application()
