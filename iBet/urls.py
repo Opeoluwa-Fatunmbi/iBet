@@ -3,6 +3,8 @@ from django.urls import path, include
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from django.conf.urls.static import static
+from django.conf import settings
 
 
 
@@ -14,7 +16,7 @@ schema_view = get_schema_view(
         title="iBet API",
         default_version='v1',
         description="iBet",
-        terms_of_service="https://www.example.com/terms/",
+        terms_of_service="https://www.iBet.com/terms/",
         contact=openapi.Contact(email="opeoluwafatunmbi@gmail.com"),
         license=openapi.License(name="MIT License"),
     ),
@@ -32,3 +34,7 @@ urlpatterns = [
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
+
+
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

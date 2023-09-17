@@ -17,16 +17,16 @@ app_name = 'core'
 
 urlpatterns = [
     # dj-rest-auth URLs
-    path('login/', LoginView.as_view(), name='rest_login'),
-    path('logout/', LogoutView.as_view(), name='rest_logout'),
-    path('password/reset/', PasswordResetView.as_view(), name='rest_password_reset'),
-    path('password/reset/confirm/', PasswordResetConfirmView.as_view(), name='rest_password_reset_confirm'),
-    path('password/change/', PasswordChangeView.as_view(), name='rest_password_change'),
+    path('login/', LoginView.as_view(), name='login'),
+    path('logout/', LogoutView.as_view(), name='logout'),
+    path('password/reset/', PasswordResetView.as_view(), name='password_reset'),
+    path('password/reset/confirm/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('password/change/', PasswordChangeView.as_view(), name='password_change'),
 
     # Registration URLs
-    path('registration/', RegisterView.as_view(), name='rest_register'),
-    path('registration/verify-email/', VerifyEmailView.as_view(), name='rest_verify_email'),
-    path('registration/verify-email/confirm/', ConfirmEmailView.as_view(), name='rest_confirm_email'),
+    path('registration/', RegisterView.as_view(), name='register'),
+    path('registration/verify-email/', VerifyEmailView.as_view(), name='verify_email'),
+    path('registration/verify-email/confirm/', ConfirmEmailView.as_view(), name='confirm_email'),
 
     # jwt
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
