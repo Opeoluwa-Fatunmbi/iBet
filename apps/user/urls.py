@@ -1,19 +1,8 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
-from dj_rest_auth.views import (
-    LoginView,
-    LogoutView,
-    PasswordResetView,
-    PasswordResetConfirmView,
-    PasswordChangeView,
-)
-from dj_rest_auth.registration.views import (
-    RegisterView,
-    VerifyEmailView,
-    ConfirmEmailView,
-)
 
-app_name = 'core'
+
+app_name = 'apps.core'
 
 urlpatterns = [
     # dj-rest-auth URLs

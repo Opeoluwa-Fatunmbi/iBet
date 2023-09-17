@@ -26,11 +26,14 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    #path('admin/', include("admin.urls")),
-    path('', include('core.urls')), 
-    path('accounts/', include('allauth.urls')),
-    path('dj-rest-auth/', include('dj_rest_auth.urls')),
-    path('dj-rest-auth/registration/', include('dj_rest_auth.registration.urls')),
+    #path('api/v1/core', include('core.urls')),
+    path('api/v1/auth/', include('apps.user.urls')),
+    path('api/v1/betting/', include('apps.betting.urls')),
+    path('api/v1/game/', include('apps.game.urls')),
+    path('api/v1/mediation/', include('apps.mediation.urls')),
+    path('api/v1/billing/', include('apps.billing.urls')), 
+
+    # Documentation
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]

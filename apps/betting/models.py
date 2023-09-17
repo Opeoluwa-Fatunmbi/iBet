@@ -1,7 +1,7 @@
 from django.db import models
-from core.models import BaseModel
-from user.models import User
-from game.models import Game
+from apps.core.models import BaseModel
+from apps.user.models import User
+from apps.game.models import Game
 # Create your models here.
 class Bet(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_bet")
