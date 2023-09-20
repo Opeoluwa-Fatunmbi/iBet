@@ -23,7 +23,7 @@ SECRET_KEY = config("SECRET_KEY")
 
 # Application definition
 DJANGO_APPS = [
-    'jazzmin',
+    'jazzmin', # Third-party ^High Priority^
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -163,7 +163,6 @@ REST_FRAMEWORK = {
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-        #'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
     ),
 
     'DEFAULT_THROTTLE_CLASSES': [

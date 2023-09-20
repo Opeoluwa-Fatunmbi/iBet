@@ -15,6 +15,9 @@ SETTINGS = config("SETTINGS")
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', f'iBet.settings.{SETTINGS}')
+os.environ.setdefault(
+    'DJANGO_SETTINGS_MODULE',
+    f'iBet.settings.{SETTINGS}',
+    )
 
 application = get_asgi_application()

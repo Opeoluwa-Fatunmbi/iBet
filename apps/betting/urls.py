@@ -1,5 +1,5 @@
 from django.urls import path
-from views import *
+from apps.betting.views import *
 
 
 app_name = 'apps.betting'
