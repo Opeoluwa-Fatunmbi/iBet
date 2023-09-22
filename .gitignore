@@ -20,8 +20,8 @@ env/
 # Local development settings
 *.sqlite3
 *.db
-*.log
-
+*.logs
+logs
 # Media and static files
 media/
 static/
