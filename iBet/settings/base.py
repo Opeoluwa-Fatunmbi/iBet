@@ -209,11 +209,11 @@ REST_AUTH = {
 REST_USE_JWT = True
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    "ROTATE_REFRESH_TOKENS": True,
-    "BLACKLIST_AFTER_ROTATION": True,
-    "UPDATE_LAST_LOGIN": False,
+    "ACCESS_TOKEN_LIFETIME": config('ACCESS_TOKEN_LIFETIME'),
+    "REFRESH_TOKEN_LIFETIME": config('REFRESH_TOKEN_LIFETIME'),
+    "ROTATE_REFRESH_TOKENS": config('ROTATE_REFRESH_TOKENS'),
+    "BLACKLIST_AFTER_ROTATION": config('BLACKLIST_AFTER_ROTATION'),
+    "UPDATE_LAST_LOGIN": config('UPDATE_LAST_LOGIN'),
 
     "ALGORITHM": "HS256",
     "SIGNING_KEY":config("SECRET_KEY"),
@@ -236,9 +236,6 @@ SIMPLE_JWT = {
 
     "JTI_CLAIM": "jti",
 
-    "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
-    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
-    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
 
     "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
     "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
