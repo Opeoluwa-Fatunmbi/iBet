@@ -21,7 +21,7 @@ env/
 *.sqlite3
 *.db
 *.logs
-logs
+logs/iBet.log
 # Media and static files
 media/
 static/
