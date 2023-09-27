@@ -10,13 +10,10 @@ import logging.config
 from django.utils.log import DEFAULT_LOGGING
 
 
-
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 SECRET_KEY = config("SECRET_KEY")
-
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -26,23 +23,24 @@ SECRET_KEY = config("SECRET_KEY")
 
 # Application definition
 DJANGO_APPS = [
-    'jazzmin', # Third-party ^High Priority^
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.sites',
+    "jazzmin",  # Third-party ^High Priority^
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.contrib.sites",
 ]
 
 THIRD_PARTY_APPS = [
-    'cloudinary',
-    'drf_yasg',
-    'rest_framework',
-    'rest_framework_jwt',
-    'rest_framework.authtoken',
-    'rest_framework_simplejwt.token_blacklist',
+    "cloudinary",
+    "drf_yasg",
+    "rest_framework",
+    "rest_framework_jwt",
+    "rest_framework.authtoken",
+    "rest_framework_api_key",
+    "rest_framework_simplejwt.token_blacklist",
     # "django_toolbar",
 ]
 
@@ -52,66 +50,64 @@ LOCAL_APPS = [
     "apps.betting",
     "apps.mediation",
     "apps.game",
-    "apps.user",
+    "apps.auth_module",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'iBet.urls'
+ROOT_URLCONF = "iBet.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.template.context_processors.request',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.template.context_processors.request",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'iBet.wsgi.application'
-
+WSGI_APPLICATION = "iBet.wsgi.application"
 
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
 
-
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
+    "django.contrib.auth.backends.ModelBackend",
 ]
 
 SITE_ID = 1
 
 # CLOUDINARY
-cloudinary.config( 
-  cloud_name =config('cloud_name'), 
-  api_key =config('api_key'), 
-  api_secret =config('api_secret'),
-  secure = True
+cloudinary.config(
+    cloud_name=config("cloud_name"),
+    api_key=config("api_key"),
+    api_secret=config("api_secret"),
+    secure=True,
 )
 
 # Password validation
@@ -119,16 +115,16 @@ cloudinary.config(
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -136,9 +132,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'Africa/Lagos'
+TIME_ZONE = "Africa/Lagos"
 
 USE_I18N = True
 
@@ -148,42 +144,37 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-AUTH_USER_MODEL = 'user.User' 
+AUTH_USER_MODEL = "auth_module.CustomUser"
 
 
 REST_USE_JWT = True
 
 
-#REST-FRAMEWORK SETTINGS
+# REST-FRAMEWORK SETTINGS
 REST_FRAMEWORK = {
-
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle'
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
     ],
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '100/day',
-        'user': '1000/day'
-    },
-
-    'DEFAULT_THROTTLE_MESSAGES': {
-        'anon': 'Too many requests. Please try again later.',
-        'user': 'Daily request limit reached. Please try again tomorrow.',
+    "DEFAULT_THROTTLE_RATES": {"anon": "100/day", "user": "1000/day"},
+    "DEFAULT_THROTTLE_MESSAGES": {
+        "anon": "Too many requests. Please try again later.",
+        "user": "Daily request limit reached. Please try again tomorrow.",
         #'custom_scope': 'You have exceeded the hourly rate limit for this view.',
     },
-
-
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework_api_key.permissions.HasAPIKey",
+    ],
 }
 
 
@@ -198,45 +189,38 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "static/media")
 
 
 REST_AUTH = {
-    'USE_JWT': True,
-    'JWT_AUTH_COOKIE': 'my-app-auth',
-    'JWT_AUTH_REFRESH_COOKIE': 'my-refresh-token',
+    "USE_JWT": True,
+    "JWT_AUTH_COOKIE": "my-app-auth",
+    "JWT_AUTH_REFRESH_COOKIE": "my-refresh-token",
 }
 
 
-
-#JWT SETTINGS
+# JWT SETTINGS
 REST_USE_JWT = True
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": config('ACCESS_TOKEN_LIFETIME'),
-    "REFRESH_TOKEN_LIFETIME": config('REFRESH_TOKEN_LIFETIME'),
-    "ROTATE_REFRESH_TOKENS": config('ROTATE_REFRESH_TOKENS'),
-    "BLACKLIST_AFTER_ROTATION": config('BLACKLIST_AFTER_ROTATION'),
-    "UPDATE_LAST_LOGIN": config('UPDATE_LAST_LOGIN'),
-
+    "ACCESS_TOKEN_LIFETIME": config("ACCESS_TOKEN_LIFETIME"),
+    "REFRESH_TOKEN_LIFETIME": config("REFRESH_TOKEN_LIFETIME"),
+    "ROTATE_REFRESH_TOKENS": config("ROTATE_REFRESH_TOKENS"),
+    "BLACKLIST_AFTER_ROTATION": config("BLACKLIST_AFTER_ROTATION"),
+    "UPDATE_LAST_LOGIN": config("UPDATE_LAST_LOGIN"),
     "ALGORITHM": "HS256",
-    "SIGNING_KEY":config("SECRET_KEY"),
+    "SIGNING_KEY": config("SECRET_KEY"),
     "VERIFYING_KEY": "",
     "AUDIENCE": None,
     "ISSUER": None,
     "JSON_ENCODER": None,
     "JWK_URL": None,
     "LEEWAY": 0,
-
     "AUTH_HEADER_TYPES": ("Bearer",),
     "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
     "USER_ID_FIELD": "id",
     "USER_ID_CLAIM": "user_id",
     "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
-
     "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
     "TOKEN_TYPE_CLAIM": "token_type",
     "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
-
     "JTI_CLAIM": "jti",
-
-
     "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
     "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
     "TOKEN_VERIFY_SERIALIZER": "rest_framework_simplejwt.serializers.TokenVerifySerializer",
@@ -291,17 +275,13 @@ logging.config.dictConfig(
 )
 
 
-
-
-
-
 JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)
     "site_title": "IBET",
     # Title on the login screen (19 chars max) (defaults to current_admin_site.site_header if absent or None)
     "site_header": "IBET V1",
     # Logo to use for your site, must be present in static files, used for brand on top left
-    #"site_logo": "media/banner2-icon3.png",
+    # "site_logo": "media/banner2-icon3.png",
     # CSS classes that are applied to the logo above
     "site_logo_classes": "img-circle",
     # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)

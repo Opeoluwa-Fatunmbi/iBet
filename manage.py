@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """Django's command-line utility for administrative tasks."""
-import os,sys
+import os, sys
 from decouple import config
 
 SETTINGS = config("SETTINGS")
@@ -10,8 +10,8 @@ def main():
     """Run administrative tasks."""
 
     os.environ.setdefault(
-        'DJANGO_SETTINGS_MODULE',
-        f'iBet.settings.{SETTINGS}',
+        "DJANGO_SETTINGS_MODULE",
+        f"iBet.settings.{SETTINGS}",
     )
 
     try:
@@ -25,5 +25,5 @@ def main():
     execute_from_command_line(sys.argv)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
