@@ -6,18 +6,20 @@ import uuid
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    class Types(models.TextChoices):
+    class Roles(models.TextChoices):
         PLAYER = "PLAYER", "Player"
         MEDIATOR = "MEDIATOR", "Mediator"
 
     id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, unique=True, editable=False
     )
-    type = models.CharField(
-        _("Type"), max_length=50, choices=Types.choices, default=Types.PLAYER
+    role = models.CharField(
+        _("Type"), max_length=50, choices=Roles.choices, default=Roles.PLAYER
     )
     username = None
     email = models.EmailField(_("email address"), unique=True)
+    full_name = models.CharField(_("full name"), max_length=150)
+    date_of_birth = models.DateField(_("date of birth"), null=True, blank=True)
     confirm_email_token = models.UUIDField(default=uuid.uuid4, null=True)
     reset_password_token = models.UUIDField(default=uuid.uuid4)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -47,17 +49,3 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self) -> str:
         return self.email
-
-
-class Player(CustomUser):
-    objects = PlayerManager()
-
-    class Meta:
-        proxy = True
-
-
-class Mediator(CustomUser):
-    objects = MediatorManager()
-
-    class Meta:
-        proxy = True

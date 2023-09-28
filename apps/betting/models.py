@@ -1,19 +1,38 @@
 from django.db import models
+from auth_module.models import CustomUser
 from apps.core.models import BaseModel
-from apps.auth_module.models import CustomUser
-from apps.game.models import Game
+from django.utils.translation import gettext_laxy as _
 
 
-# Create your models here.
+class Match(BaseModel):
+    # Fields for a match
+    # match_date,
+    # game_type, etc.
+    pass
+
+
 class Bet(BaseModel):
-    user = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, related_name="user_bet"
-    )
-    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="game_bet")
-    stake_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    chosen_player = models.ForeignKey(
-        CustomUser, related_name="chosen_bets", on_delete=models.CASCADE
-    )
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    match = models.ForeignKey(Match, on_delete=models.CASCADE)
+    amount = models.DecimalField(_("Amount"), max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"{self.user.username} - {self.game.name}"
+        return self.user
+
+    class Meta:
+        verbose_name = "Bet"
+        verbose_plural = "Bets"
+
+
+class Outcome(BaseModel):
+    match = models.ForeignKey(Match, on_delete=models.CASCADE)
+    winner = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+
+    # winning amount,
+    #  status, etc.
+    def __str__(self):
+        return self.match
+
+    class Meta:
+        verbose_name = "Match"
+        verbose_plural = "Matches"
