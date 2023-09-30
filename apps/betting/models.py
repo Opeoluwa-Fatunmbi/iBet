@@ -5,8 +5,7 @@ from django.utils.translation import gettext_laxy as _
 
 
 class Match(BaseModel):
-    # Fields for a match
-    # match_date,
+    match_date = models.TimeField(_(""), auto_now=False, auto_now_add=False)
     # game_type, etc.
     pass
 
