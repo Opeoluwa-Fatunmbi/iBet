@@ -1,6 +1,6 @@
 from django.db import models
-from auth_module.models import CustomUser
-from betting.models import Bet
+from apps.auth_module.models import CustomUser
+from apps.betting.models import Bet
 from apps.core.models import BaseModel
 from django.utils.translation import gettext_lazy as _
 
@@ -15,8 +15,8 @@ class Mediator(BaseModel):
         return self.user
 
     class Meta:
-        verbose_name = _("Mediator")
-        verbose_name_plural = _("Mediators")
+        verbose_name = "Mediator"
+        verbose_name_plural = "Mediators"
 
 
 class Mediation(BaseModel):
@@ -31,5 +31,5 @@ class Mediation(BaseModel):
         return self.mediator
 
     class Meta:
-        verbose_name = _("Mediation")
-        verbose_name_plural = _("Mediations")
+        verbose_name = "Mediation"
+        verbose_name_plural = "Mediations"

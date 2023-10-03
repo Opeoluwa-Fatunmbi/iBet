@@ -1,5 +1,5 @@
 from django.db import models
-from auth_module.models import CustomUser
+from apps.auth_module.models import CustomUser
 from django.utils.translation import gettext_lazy as _
 from apps.core.models import BaseModel
 
@@ -35,7 +35,7 @@ class Game(BaseModel):
 
     class Meta:
         verbose_name = "Game"
-        verbose_plural = "Games"
+        verbose_name_plural = "Games"
 
 
 class Player(BaseModel):
@@ -49,4 +49,4 @@ class Player(BaseModel):
 
     class Meta:
         verbose_name = "Player"
-        verbose_plural = "Players"
+        verbose_name_plural = "Players"

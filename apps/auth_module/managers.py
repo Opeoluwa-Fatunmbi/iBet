@@ -2,7 +2,9 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.db.models.query import QuerySet
 from django.utils.translation import gettext_lazy as _
 from django.db import models
-from apps.auth_module.models import CustomUser
+
+# from apps.auth_module.models import CustomUser
+from django.apps import apps  # Import apps module for lazy reference
 
 
 class CustomUserManager(BaseUserManager):
@@ -25,17 +27,3 @@ class CustomUserManager(BaseUserManager):
         if extra_fields.get("is_superuser") is not True:
             raise ValueError(_("Superuser must have is_superuser set to True."))
         return self.create_user(email=email, password=password, **extra_fields)
-
-
-class PlayerManager(models.Manager):
-    def get_queryset(self, *args, **kwargs) -> QuerySet:
-        return (
-            super().get_queryset(*args, **kwargs).filter(type=CustomUser.Types.PLAYER)
-        )
-
-
-class MediatorManager(models.Manager):
-    def get_queryset(self, *args, **kwargs) -> QuerySet:
-        return (
-            super().get_queryset(*args, **kwargs).filter(type=CustomUser.Types.MEDIATOR)
-        )

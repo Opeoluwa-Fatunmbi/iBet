@@ -1,20 +1,23 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
-from .managers import CustomUserManager, PlayerManager, MediatorManager
+from apps.auth_module.managers import CustomUserManager
 import uuid
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    class Roles(models.TextChoices):
-        PLAYER = "PLAYER", "Player"
-        MEDIATOR = "MEDIATOR", "Mediator"
+    class ROLES_CHOICES(models.TextChoices):
+        PLAYER = "PLAYER", _("Player")
+        MEDIATOR = "MEDIATOR", _("Mediator")
 
-    custom_id = models.UUIDField(
+    id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, unique=True, editable=False
     )
     role = models.CharField(
-        _("Type"), max_length=50, choices=Roles.choices, default=Roles.PLAYER
+        _("Role Choices"),
+        max_length=50,
+        choices=ROLES_CHOICES.choices,
+        default=ROLES_CHOICES.PLAYER,
     )
     username = None
     email = models.EmailField(_("email address"), unique=True)
@@ -49,3 +52,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self) -> str:
         return self.email
+
+    class Meta:
+        verbose_name = "Custom User"
+        verbose_name_plural = "Custom Users"

@@ -9,7 +9,7 @@ from rest_framework import status
 
 
 class GamesList(APIView):
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
     def get(self, request: Request):
         queryset = Game.objects.all()
@@ -30,6 +30,32 @@ class GamesList(APIView):
             },
             status=status.HTTP_404_NOT_FOUND,
         )
+
+
+class CreateGame(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def post(self, request: Request):
+        """
+        POST method to create a new game
+        """
+        data = request.data
+        serializer = GameSerializer(data=data)
+
+        if serializer.is_valid:
+            serializer.save()
+            response = {
+                "status": "success",
+                "message": "Game created successfully",
+                "data": serializer.data,
+            }
+            return Response(response, status=status.HTTP_201_CREATED)
+        bad_request_response = {
+            "status": "failed",
+            "message": "Game not created",
+            "error_message": serializer.errors,
+        }
+        return Response(bad_request_response, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Create similar views for Player

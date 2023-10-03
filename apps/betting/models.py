@@ -1,21 +1,26 @@
 from django.db import models
-from auth_module.models import CustomUser
+from apps.auth_module.models import CustomUser
 from apps.core.models import BaseModel
-from django.utils.translation import gettext_laxy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class Match(models.Model):
-    class STATUS_CHOICES(models.TextChoices):
-        SCHEDULED = "SCHEDULED", "Scheduled"
-        IN_PROGESS = "IN PROGESS", "In Progress"
-        COMPLETED = "COMPLETED", "Completed"
+    class MATCH_STATUS_CHOICES(models.TextChoices):
+        SCHEDULED = "SCHEDULED", _("Scheduled")
+        IN_PROGRESS = "IN_PROGRESS", _("In Progress")
+        COMPLETED = "COMPLETED", _("Completed")
 
     match_date = models.DateTimeField(
         _("Match Date"), auto_now=False, auto_now_add=False
     )
     game_type = models.CharField(_("Game Type"), max_length=100)
     location = models.CharField(_("Location"), max_length=100)
-    status = models.CharField(_("Status"), max_length=20, choices=STATUS_CHOICES)
+    status = models.CharField(
+        _("Status"),
+        max_length=20,
+        choices=MATCH_STATUS_CHOICES.choices,
+        default=MATCH_STATUS_CHOICES.SCHEDULED,
+    )
     winner = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
@@ -55,7 +60,7 @@ class Bet(BaseModel):
 
     class Meta:
         verbose_name = "Bet"
-        verbose_plural = "Bets"
+        verbose_name_plural = "Bets"
 
 
 class Outcome(BaseModel):
@@ -68,4 +73,4 @@ class Outcome(BaseModel):
 
     class Meta:
         verbose_name = "Match"
-        verbose_plural = "Matches"
+        verbose_name_plural = "Matches"

@@ -10,14 +10,14 @@ from django.core.exceptions import ObjectDoesNotExist
 import uuid
 
 
-class CreateUsers(APIView):
+class CreateUser(APIView):
     """
     CreateUsers class handles the creation of user accounts.
 
     POST: Create a new user account and send a confirmation email(requires admin authentication)..
     """
 
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def post(self, request: Request):
         """
