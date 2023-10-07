@@ -4,3 +4,4 @@ from apps.mediation.models import *
 
 # Register your models here.
 admin.site.register(Mediator)
+admin.site.register(Mediation)

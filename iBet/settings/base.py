@@ -35,7 +35,7 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     "cloudinary",
-    "drf_yasg",
+    "drf_spectacular",
     "rest_framework",
     "rest_framework_jwt",
     "rest_framework.authtoken",
@@ -175,6 +175,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework_api_key.permissions.HasAPIKey",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 
@@ -275,6 +276,14 @@ logging.config.dictConfig(
 )
 
 
+SPECTACULAR_SETTINGS = {
+    "TITLE": "iBet API",
+    "DESCRIPTION": "Bet on your own skills!",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
+
+
 JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)
     "site_title": "IBET",
@@ -293,7 +302,7 @@ JAZZMIN_SETTINGS = {
     # Copyright on the footer
     "copyright": "iBet Copyright",
     # The model admin to search from the search bar, search bar omitted if excluded
-    "search_model": "accounts.User",
+    "search_model": "auth_module.CustomUser",
     # Field name on user model that contains avatar ImageField/URLField/Charfield or a callable that receives the user
     "user_avatar": "avatar",
     ############
@@ -310,9 +319,12 @@ JAZZMIN_SETTINGS = {
         # model admin to link to (Permissions checked against model)
         # {"model": "accounts.User"},
         # App with dropdown menu to all its models pages (Permissions checked against models)
-        {"app": "accounts"},
-        {"app": "general"},
-        {"app": "listings"},
+        {"app": "auth_module"},
+        {"app": "core"},
+        {"app": "game"},
+        {"app": "betting"},
+        {"app": "mediation"},
+        {"app": "billing"},
     ],
     #############
     # User Menu #

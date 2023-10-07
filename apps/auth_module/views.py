@@ -1,57 +1,73 @@
+# Standard library imports
+import uuid
+
+# Third-party imports
+from django.core.mail import send_mail
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError, transaction
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
+from drf_spectacular.utils import extend_schema
+
+# Local application imports
 from apps.auth_module.models import CustomUser
 from apps.auth_module.serializers import CustomUserSerializer
-from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
-from django.core.mail import send_mail
-from django.core.exceptions import ObjectDoesNotExist
-import uuid
 
 
-class CreateUser(APIView):
-    """
-    CreateUsers class handles the creation of user accounts.
+class SignupView(APIView):
+    serializer_class = CustomUserSerializer
 
-    POST: Create a new user account and send a confirmation email(requires admin authentication)..
-    """
+    @extend_schema(
+        summary="Register a new user",
+        description="This endpoint registers new users into our application",
+    )
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
 
-    # permission_classes = [IsAuthenticated]
+        try:
+            with transaction.atomic():
+                serializer.is_valid(raise_exception=True)
+                data = serializer.validated_data
 
-    def post(self, request: Request):
-        """
-        POST method to create a new user account and send a confirmation email(requires admin authentication)..
-        """
-        data = request.data
-        serializer = CustomUserSerializer(data=data)
-        if serializer.is_valid():
-            user = serializer.save()
-            # Send a confirmation email with a confirmation link
-            subject = "Confirm your email address"
-            message = "Click the link to confirm your email address"
-            from_email = "abiolaadedayo1993@gmail.com"
-            recipient_list = [user.email]
+                # Check for existing user by email
+                existing_user = CustomUser.objects.filter(email=data["email"]).first()
 
-            # Generate a confirmation URL
+                if existing_user:
+                    response_data = {
+                        "status": "Invalid Entry",
+                        "message": "Email already registered!",
+                    }
+                    return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
-            confirmation_url = f"http://127.0.0.1:8000/api/v1/confirm_email?user_id={user.id}&token={user.confirm_email_token}"
+                # Create user
+                serializer.save()
 
-            message += f"\n\n{confirmation_url}"
+                response_data = {
+                    "status": "success",
+                    "message": "Account created successfully. Please check your email for a confirmation link.",
+                    "data": serializer.data,
+                }
+                return Response(response_data, status=status.HTTP_201_CREATED)
 
-            send_mail(subject, message, from_email, recipient_list)
-            response = {
-                "status": "success",
-                "message": "Account created successfully. Please check your email for a confirmation link.",
-                "data": serializer.data,
+        except IntegrityError as e:
+            # Handle database integrity error (e.g., unique constraint violation)
+            response_data = {
+                "status": "failed",
+                "message": "Account not created",
+                "error_message": str(e),
             }
-            return Response(response, status=status.HTTP_201_CREATED)
-        bad_request_response = {
-            "status": "failed",
-            "message": "Account not created",
-            "error_message": serializer.errors,
-        }
-        return Response(bad_request_response, status=status.HTTP_400_BAD_REQUEST)
+            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            # Handle other exceptions
+            response_data = {
+                "status": "failed",
+                "message": "Account not created",
+                "error_message": str(e),
+            }
+            return Response(response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ListUsers(APIView):
@@ -73,13 +89,9 @@ class ListUsers(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 
-class RetrieveUpdateDeleteUser(APIView):
+class RetrieveUser(APIView):
     """
-    RetrieveUpdateDeleteUser class handles the retrieval, update, and deletion of user accounts.
-
     GET: Retrieve detailed information about a specific user account.
-    PUT: Update user account information (allows partial updates).
-    DELETE: Delete a specific user account.
     """
 
     permission_classes = [IsAuthenticated]
@@ -103,57 +115,6 @@ class RetrieveUpdateDeleteUser(APIView):
             }
             return Response(authentication_response, status=status.HTTP_403_FORBIDDEN)
         response = {"status": "success", "data": serializer.data}
-        return Response(response, status=status.HTTP_200_OK)
-
-    def put(self, request: Request, pk):
-        """
-        PUT method to update user account information (allows partial updates).
-        """
-        try:
-            queryset = CustomUser.objects.get(pk=pk)
-        except CustomUser.DoesNotExist:
-            error_response = {"status": "error", "message": "User not found"}
-            return Response(error_response, status=status.HTTP_404_NOT_FOUND)
-
-        user = request.user
-        if user.email != queryset.email:
-            authentication_response = {
-                "status": "failed",
-                "message": "User Not Authorized",
-            }
-            return Response(authentication_response, status=status.HTTP_403_FORBIDDEN)
-        data = request.data
-        serializer = CustomUserSerializer(queryset, data=data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            response = {
-                "status": "success",
-                "message": "Account updated suucessfully",
-                "data": serializer.data,
-            }
-            return Response(response, status=status.HTTP_202_ACCEPTED)
-        bad_request_response = {
-            "status": "failed",
-            "message": "Account update failed",
-            "error_message": serializer.errors,
-        }
-        return Response(bad_request_response, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request: Request, pk):
-        try:
-            queryset = CustomUser.objects.get(pk=pk)
-        except CustomUser.DoesNotExist:
-            error_response = {"status": "error", "message": "User not found"}
-            return Response(error_response, status=status.HTTP_404_NOT_FOUND)
-        user = request.user
-        if user.email != queryset.email:
-            authentication_response = {
-                "status": "failed",
-                "message": "User Not Authorized",
-            }
-            return Response(authentication_response, status=status.HTTP_403_FORBIDDEN)
-        queryset.delete()
-        response = {"status": "success", "message": "Account deleted successfully."}
         return Response(response, status=status.HTTP_200_OK)
 
 
