@@ -1,37 +1,50 @@
 from rest_framework import serializers
 from apps.auth_module.models import CustomUser
+from django.utils.translation import gettext_lazy as _
 
 
-class CustomUserSerializer(serializers.ModelSerializer):
-    """
-    CustomUserSerializer handles the serialization of user data.
+class RegisterSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(
+        min_length=8, error_messages={"min_length": _("{min_length} characters min.")}
+    )
+    terms_agreement = serializers.BooleanField()
 
-    It includes fields for user details and role_id.
-    """
+    def validate(self, attrs):
+        email = attrs["email"]
+        terms_agreement = attrs["terms_agreement"]
 
-    class Meta:
-        model = CustomUser
-        fields = ["id", "email", "password", "role"]
+        if len(email.split(" ")) > 1:
+            raise serializers.ValidationError({"email": "No spacing allowed"})
 
-    def create(self, validated_data):
-        """
-        Create a new user instance and set the password.
-        """
-        password = validated_data.pop("password", None)
-        instance = self.Meta.model(**validated_data)
-        if password is not None:
-            instance.set_password(password)
-        instance.save()
-        return instance
+        if terms_agreement != True:
+            raise serializers.ValidationError(
+                {"terms_agreement": "You must agree to terms and conditions"}
+            )
+        return attrs
 
-    def update(self, instance, validated_data):
-        """
-        Update the user instance with the provided validated data.
-        """
-        for attr, value in validated_data.items():
-            if attr == "password":
-                instance.set_password(value)
-            else:
-                setattr(instance, attr, value)
-        instance.save()
-        return instance
+
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField()
+
+
+class RefreshSerializer(serializers.Serializer):
+    refresh = serializers.CharField()
+
+
+class SetNewPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    otp = serializers.IntegerField()
+    password = serializers.CharField(
+        min_length=8, error_messages={"min_length": _("{min_length} characters min.")}
+    )
+
+class VerifyOtpSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    otp = serializers.IntegerField()
+
+
+class ResendOtpSerializer(serializers.Serializer):
+    email = serializers.EmailField()

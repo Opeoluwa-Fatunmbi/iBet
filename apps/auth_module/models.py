@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from apps.auth_module.managers import CustomUserManager
+from apps.core.models import BaseModel
 import uuid
 
 
@@ -24,8 +25,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=50, default="John")
     last_name = models.CharField(max_length=50, default="Doe")
     date_of_birth = models.DateField(_("date of birth"), null=True, blank=True)
-    confirm_email_token = models.UUIDField(default=uuid.uuid4, null=True)
-    reset_password_token = models.UUIDField(default=uuid.uuid4)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_email_verified = models.BooleanField(default=False)
@@ -57,3 +56,15 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
+
+
+
+class Jwt(BaseModel):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    access = models.TextField()
+    refresh = models.TextField()
+
+
+class Otp(BaseModel):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    code = models.IntegerField()

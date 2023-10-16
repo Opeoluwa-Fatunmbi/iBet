@@ -1,11 +1,8 @@
-# Standard library imports
 import uuid
-
-# Third-party imports
 from django.core.mail import send_mail
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError, transaction
-from rest_framework.views import APIView
+from adrf.views import APIView
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -13,21 +10,22 @@ from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from drf_spectacular.utils import extend_schema
 from rest_framework.throttling import UserRateThrottle
 from django.contrib.auth import authenticate, login, logout
-
-# Local application imports
 from apps.auth_module.models import CustomUser
-from apps.auth_module.serializers import CustomUserSerializer
+from apps.auth_module.serializers import RegisterSerializer
+from .emails import Util
+from asgiref.sync import sync_to_async
+from asgiref.sync import async_to_sync
 
 
 class SignupView(APIView):
-    serializer_class = CustomUserSerializer
+    serializer_class = RegisterSerializer
     throttle_classes = [UserRateThrottle]
 
     @extend_schema(
         summary="Register a new user",
         description="This endpoint registers new users into our application",
     )
-    def post(self, request):
+    async def post(self, request):
         serializer = self.serializer_class(data=request.data)
 
         try:
@@ -46,7 +44,9 @@ class SignupView(APIView):
                     return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
                 # Create user
-                serializer.save()
+                user = serializer.save()
+                # Send verification email
+                await Util.send_activation_otp(user)
 
                 response_data = {
                     "status": "success",
@@ -71,6 +71,7 @@ class SignupView(APIView):
                 "error_message": str(e),
             }
             return Response(response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 class LoginView(APIView):
@@ -173,11 +174,11 @@ class UserConfirmEmailAddress(APIView):
         """
         GET method to confirm a user's email address with a valid token.
         """
-        user_id = request.query_params.get("user_id")
+        user_id = request.query_params.get("id")
         confirm_email_token = request.query_params.get("token")
 
         try:
-            user = CustomUser.objects.get(pk=user_id)
+            user = CustomUser.objects.get(pk=id)
         except CustomUser.DoesNotExist:
             error_response = {"status": "error", "message": "User not found"}
             return Response(error_response, status=status.HTTP_404_NOT_FOUND)
@@ -228,7 +229,7 @@ class UserForgetPassword(APIView):
 
         # Generate a forget password URL
 
-        forget_password_url = f"http://127.0.0.1:8000/api/v1/reset_password?user_id={user.id}&token={user.reset_password_token}/"
+        forget_password_url = f"http://127.0.0.1:8000/api/v1/reset_password?id={user.id}&token={user.reset_password_token}/"
 
         message += f"\n\n{forget_password_url}"
 
