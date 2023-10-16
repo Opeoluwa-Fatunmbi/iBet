@@ -23,7 +23,7 @@ class Game(BaseModel):
     description = models.TextField(max_length=500)
     rules = models.TextField(_("Rules"), max_length=500)
     game = models.CharField(
-        _("Rules"), max_length=50, choices=Games.choices, default=Games.EIGHTBALL
+        _("Game"), max_length=50, choices=Games.choices, default=Games.EIGHTBALL
     )
     goal = models.TextField(_("Goal"), max_length=200)
     min_players = models.PositiveIntegerField(default=2)
@@ -40,7 +40,6 @@ class Game(BaseModel):
 
 class Player(BaseModel):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    game = models.ForeignKey(Game, on_delete=models.CASCADE)
     score = models.PositiveIntegerField(default=0)
     experience_level = models.CharField(max_length=50, blank=True, null=True)
 

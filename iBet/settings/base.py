@@ -39,7 +39,6 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_jwt",
     "rest_framework.authtoken",
-    "rest_framework_api_key",
     "rest_framework_simplejwt.token_blacklist",
     # "django_toolbar",
 ]
@@ -172,9 +171,6 @@ REST_FRAMEWORK = {
         "user": "Daily request limit reached. Please try again tomorrow.",
         #'custom_scope': 'You have exceeded the hourly rate limit for this view.',
     },
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework_api_key.permissions.HasAPIKey",
-    ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 

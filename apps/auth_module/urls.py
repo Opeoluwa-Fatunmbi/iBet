@@ -1,6 +1,8 @@
 from django.urls import path
 from apps.auth_module.views import (
     ListUsers,
+    LoginView,
+    LogoutView,
     SignupView,
     RetrieveUser,
     UserConfirmEmailAddress,
@@ -15,6 +17,8 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns = [
     path("signup/", SignupView.as_view(), name="signup"),
+    path("login/", LoginView.as_view(), name="login"),
+    path("logout/", LogoutView.as_view(), name="logout"),
     path("users/", ListUsers.as_view(), name="list-users"),
     path(
         "user/<str:pk>/",

@@ -21,12 +21,15 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     )
     username = None
     email = models.EmailField(_("email address"), unique=True)
-    full_name = models.CharField(_("full name"), max_length=150)
+    first_name = models.CharField(max_length=50, default="John")
+    last_name = models.CharField(max_length=50, default="Doe")
     date_of_birth = models.DateField(_("date of birth"), null=True, blank=True)
     confirm_email_token = models.UUIDField(default=uuid.uuid4, null=True)
     reset_password_token = models.UUIDField(default=uuid.uuid4)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_email_verified = models.BooleanField(default=False)
+    terms_agreement = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -48,5 +51,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         return self.email
 
     class Meta:
-        verbose_name = "Custom User"
-        verbose_name_plural = "Custom Users"
+        verbose_name = "User"
+        verbose_name_plural = "Users"
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
