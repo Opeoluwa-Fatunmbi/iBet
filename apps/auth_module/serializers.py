@@ -23,6 +23,21 @@ class RegisterSerializer(serializers.Serializer):
             )
         return attrs
 
+    def create(self, validated_data):
+        email = validated_data["email"]
+        password = validated_data["password"]
+        terms_agreement = validated_data["terms_agreement"]
+
+        # Check if the email is already in use
+        if CustomUser.objects.filter(email=email).exists():
+            raise serializers.ValidationError(
+                {"email": "This email is already registered"}
+            )
+
+        user = CustomUser.objects.create_user(
+            email=email, password=password, terms_agreement=terms_agreement
+        )
+        return user
 
 
 class LoginSerializer(serializers.Serializer):
@@ -40,6 +55,7 @@ class SetNewPasswordSerializer(serializers.Serializer):
     password = serializers.CharField(
         min_length=8, error_messages={"min_length": _("{min_length} characters min.")}
     )
+
 
 class VerifyOtpSerializer(serializers.Serializer):
     email = serializers.EmailField()

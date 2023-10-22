@@ -34,7 +34,7 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    'adrf',
+    "adrf",
     "cloudinary",
     "drf_spectacular",
     "rest_framework",
@@ -104,9 +104,9 @@ SITE_ID = 1
 
 # CLOUDINARY
 cloudinary.config(
-    cloud_name=config("cloud_name"),
-    api_key=config("api_key"),
-    api_secret=config("api_secret"),
+    cloud_name=config("CLOUD_NAME"),
+    api_key=config("API_KEY"),
+    api_secret=config("API_SECRET"),
     secure=True,
 )
 
@@ -176,7 +176,6 @@ REST_FRAMEWORK = {
 }
 
 
-
 # Email Settings
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = config("EMAIL_HOST")
@@ -186,6 +185,10 @@ EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
 # EMAIL_USE_SSL = config("EMAIL_USE_SSL")
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
 
+
+EMAIL_OTP_EXPIRE_SECONDS = config("EMAIL_OTP_EXPIRE_SECONDS")
+ACCESS_TOKEN_EXPIRE_MINUTES = config("ACCESS_TOKEN_EXPIRE_MINUTES")
+REFRESH_TOKEN_EXPIRE_MINUTES = config("REFRESH_TOKEN_EXPIRE_MINUTES")
 
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
@@ -387,4 +390,3 @@ JAZZMIN_SETTINGS = {
     },
     # "related_modal_active": True # Won't work in some browsers
 }
-

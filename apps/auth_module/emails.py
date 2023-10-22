@@ -14,7 +14,7 @@ class EmailThread(threading.Thread):
 
 
 class Util:
-    async def send_activation_otp(user):
+    def send_activation_otp(user):
         subject = "Verify your email"
         code = random.randint(100000, 999999)
         message = render_to_string(
@@ -24,18 +24,18 @@ class Util:
                 "otp": code,
             },
         )
-        otp = await accounts_models.Otp.objects.get_or_none(user=user)
+        otp = accounts_models.Otp.objects.get_or_none(user=user)
         if not otp:
-            await accounts_models.Otp.objects.acreate(user=user, code=code)
+            accounts_models.Otp.objects.create(user=user, code=code)
         else:
             otp.code = code
-            await otp.asave()
+            otp.save()
 
         email_message = EmailMessage(subject=subject, body=message, to=[user.email])
         email_message.content_subtype = "html"
         EmailThread(email_message).start()
 
-    async def send_password_change_otp(user):
+    def send_password_change_otp(user):
         subject = "Your account password reset email"
         code = random.randint(100000, 999999)
         message = render_to_string(
@@ -45,12 +45,12 @@ class Util:
                 "otp": code,
             },
         )
-        otp = await accounts_models.Otp.objects.get_or_none(user=user)
+        otp = accounts_models.Otp.objects.get_or_none(user=user)
         if not otp:
-            await accounts_models.Otp.objects.acreate(user=user, code=code)
+            accounts_models.Otp.objects.create(user=user, code=code)
         else:
             otp.code = code
-            await otp.asave()
+            otp.save()
 
         email_message = EmailMessage(subject=subject, body=message, to=[user.email])
         email_message.content_subtype = "html"
@@ -81,5 +81,3 @@ class Util:
         email_message = EmailMessage(subject=subject, body=message, to=[user.email])
         email_message.content_subtype = "html"
         EmailThread(email_message).start()
-
-

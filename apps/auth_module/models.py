@@ -58,7 +58,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         return f"{self.first_name} {self.last_name}"
 
 
-
 class Jwt(BaseModel):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     access = models.TextField()

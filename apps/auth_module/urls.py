@@ -1,35 +1,32 @@
 from django.urls import path
 from apps.auth_module.views import (
-    ListUsers,
     LoginView,
     LogoutView,
-    SignupView,
-    RetrieveUser,
-    UserConfirmEmailAddress,
-    UserForgetPassword,
-    UserResetPassword,
-)
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
+    RegisterView,
+    VerifyEmailView,
+    ResendVerificationEmailView,
+    SendPasswordResetOtpView,
+    SetNewPasswordView,
+    RefreshTokensView,
 )
 
+app_name = "apps.auth_module"
 
 urlpatterns = [
-    path("signup/", SignupView.as_view(), name="signup"),
+    path("register/", RegisterView.as_view(), name="register"),
+    path("verify-email/", VerifyEmailView.as_view(), name="verify-email"),
+    path(
+        "resend-verification-email/",
+        ResendVerificationEmailView.as_view(),
+        name="resend-verification-email",
+    ),
+    path(
+        "send-password-reset-otp/",
+        SendPasswordResetOtpView.as_view(),
+        name="send-password-reset-otp",
+    ),
+    path("set-new-password/", SetNewPasswordView.as_view(), name="set-new-password"),
     path("login/", LoginView.as_view(), name="login"),
+    path("refresh/", RefreshTokensView.as_view(), name="refresh-tokens"),
     path("logout/", LogoutView.as_view(), name="logout"),
-    path("users/", ListUsers.as_view(), name="list-users"),
-    path(
-        "user/<str:id>/",
-        RetrieveUser.as_view(),
-        name="retrieve-user",
-    ),
-    # path("login/", LoginView.as_view(), name="token_obtain_pair"),
-    path("refresh_token/", TokenRefreshView.as_view(), name="token_refresh"),
-    path(
-        "confirm_email/", UserConfirmEmailAddress.as_view(), name="confirm-user-email"
-    ),
-    path("forget_password/", UserForgetPassword.as_view(), name="forget-user-password"),
-    path("reset_password/", UserResetPassword.as_view(), name="reset-user-password"),
 ]
