@@ -2,7 +2,8 @@ import uuid
 from django.core.mail import send_mail
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError, transaction
-from rest_framework.views import APIView
+from adrf.views import APIView
+import asgiref.sync
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -31,7 +32,7 @@ class RegisterView(APIView):
         summary="Register a new user",
         description="This endpoint registers new users into our application",
     )
-    def post(self, request):
+    async def post(self, request):
         serializer = self.serializer_class(data=request.data)
 
         try:
@@ -39,8 +40,12 @@ class RegisterView(APIView):
                 serializer.is_valid(raise_exception=True)
                 data = serializer.validated_data
 
-                # Check for existing user by email
-                existing_user = CustomUser.objects.filter(email=data["email"]).first()
+                async def check_existing_user(email):
+                    existing_user = await CustomUser.objects.filter(email=email).first()
+                    return existing_user
+
+                # Call the asynchronous function directly
+                existing_user = await check_existing_user(data["email"])
 
                 if existing_user:
                     response_data = {
@@ -52,7 +57,7 @@ class RegisterView(APIView):
                 # Create user
                 user = serializer.save()
                 # Send verification email
-                Util.send_activation_otp(user)
+                await Util.send_activation_otp(user)
 
                 response_data = {
                     "status": "success",

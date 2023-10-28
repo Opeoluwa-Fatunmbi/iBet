@@ -1,7 +1,9 @@
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
-from . import models as accounts_models
-import random, threading
+from apps.auth_module import models as accounts_models
+import random
+import threading
+import asgiref.sync
 
 
 class EmailThread(threading.Thread):
@@ -14,49 +16,48 @@ class EmailThread(threading.Thread):
 
 
 class Util:
-    def send_activation_otp(user):
+    @staticmethod
+    def get_or_create_otp(user):
+        otp, _ = accounts_models.Otp.objects.get_or_create(
+            user=user, defaults={"code": random.randint(100000, 999999)}
+        )
+        return otp
+
+    @staticmethod
+    async def send_activation_otp(user):
+        otp = await asgiref.sync.sync_to_async(Util.get_or_create_otp)(user)
+
         subject = "Verify your email"
-        code = random.randint(100000, 999999)
         message = render_to_string(
             "email-activation.html",
             {
                 "name": user.full_name,
-                "otp": code,
+                "otp": otp.code,
             },
         )
-        otp = accounts_models.Otp.objects.get_or_none(user=user)
-        if not otp:
-            accounts_models.Otp.objects.create(user=user, code=code)
-        else:
-            otp.code = code
-            otp.save()
 
         email_message = EmailMessage(subject=subject, body=message, to=[user.email])
         email_message.content_subtype = "html"
         EmailThread(email_message).start()
 
-    def send_password_change_otp(user):
+    @staticmethod
+    async def send_password_change_otp(user):
+        otp = await asgiref.sync.sync_to_async(Util.get_or_create_otp)(user)
+
         subject = "Your account password reset email"
-        code = random.randint(100000, 999999)
         message = render_to_string(
             "password-reset.html",
             {
                 "name": user.full_name,
-                "otp": code,
+                "otp": otp.code,
             },
         )
-        otp = accounts_models.Otp.objects.get_or_none(user=user)
-        if not otp:
-            accounts_models.Otp.objects.create(user=user, code=code)
-        else:
-            otp.code = code
-            otp.save()
 
         email_message = EmailMessage(subject=subject, body=message, to=[user.email])
         email_message.content_subtype = "html"
-
         EmailThread(email_message).start()
 
+    @staticmethod
     def password_reset_confirmation(user):
         subject = "Password Reset Successful!"
         message = render_to_string(

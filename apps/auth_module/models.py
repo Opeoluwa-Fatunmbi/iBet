@@ -45,6 +45,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         default=False,
         help_text=_("Designates whether the user has all permissions."),
     )
+    is_active = models.BooleanField(default=True)
 
     def __str__(self) -> str:
         return self.email
