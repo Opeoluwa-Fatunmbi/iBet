@@ -3,6 +3,8 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from apps.auth_module.managers import CustomUserManager
 from apps.core.models import BaseModel
+from django.conf import settings
+from django.utils import timezone
 import uuid
 
 
@@ -68,3 +70,10 @@ class Jwt(BaseModel):
 class Otp(BaseModel):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     code = models.IntegerField()
+
+    def check_expiration(self):
+        now = timezone.now()
+        diff = now - self.updated_at
+        if diff.total_seconds() > int(settings.EMAIL_OTP_EXPIRE_SECONDS):
+            return True
+        return False

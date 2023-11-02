@@ -2,13 +2,14 @@ import uuid
 from django.core.mail import send_mail
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError, transaction
-from adrf.views import APIView
+from rest_framework.views import APIView
 import asgiref.sync
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from drf_spectacular.utils import extend_schema
+from django.shortcuts import get_object_or_404
 from rest_framework.throttling import UserRateThrottle
 from django.contrib.auth import authenticate, login, logout
 from apps.auth_module.models import CustomUser, Otp, Jwt
@@ -251,28 +252,18 @@ class SetNewPasswordView(APIView):
             code = data["otp"]
             password = data["password"]
 
-            try:
-                user = CustomUser.objects.get(email=email)
-            except CustomUser.DoesNotExist:
-                return Response(
-                    {"error": "User not found"}, status=status.HTTP_404_NOT_FOUND
-                )
-
-            try:
-                otp = Otp.objects.get(user=user)
-            except Otp.DoesNotExist:
-                return Response(
-                    {"error": "OTP not found"}, status=status.HTTP_404_NOT_FOUND
-                )
+            # Use get_object_or_404 for user and OTP retrieval
+            user = get_object_or_404(CustomUser, email=email)
+            otp = get_object_or_404(Otp, user=user)
 
             if otp.code != code:
                 return Response(
-                    {"error": "Incorrect OTP"}, status=status.HTTP_400_BAD_REQUEST
+                    {"error": "Incorrect OTP"}, status=status.HTTP_401_UNAUTHORIZED
                 )
 
             if otp.check_expiration():
                 return Response(
-                    {"error": "Expired OTP"}, status=status.HTTP_400_BAD_REQUEST
+                    {"error": "Expired OTP"}, status=status.HTTP_401_UNAUTHORIZED
                 )
 
             user.set_password(password)
@@ -282,6 +273,7 @@ class SetNewPasswordView(APIView):
             return Response(
                 {"message": "Password reset successful"}, status=status.HTTP_200_OK
             )
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

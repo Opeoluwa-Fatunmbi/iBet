@@ -208,41 +208,6 @@ REST_AUTH = {
 }
 
 
-# JWT SETTINGS
-REST_USE_JWT = True
-
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": config("ACCESS_TOKEN_LIFETIME"),
-    "REFRESH_TOKEN_LIFETIME": config("REFRESH_TOKEN_LIFETIME"),
-    "ROTATE_REFRESH_TOKENS": config("ROTATE_REFRESH_TOKENS"),
-    "BLACKLIST_AFTER_ROTATION": config("BLACKLIST_AFTER_ROTATION"),
-    "UPDATE_LAST_LOGIN": config("UPDATE_LAST_LOGIN"),
-    "ALGORITHM": "HS256",
-    "SIGNING_KEY": config("SECRET_KEY"),
-    "VERIFYING_KEY": "",
-    "AUDIENCE": None,
-    "ISSUER": None,
-    "JSON_ENCODER": None,
-    "JWK_URL": None,
-    "LEEWAY": 0,
-    "AUTH_HEADER_TYPES": ("Bearer",),
-    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
-    "USER_ID_FIELD": "id",
-    "USER_ID_CLAIM": "user_id",
-    "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
-    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
-    "TOKEN_TYPE_CLAIM": "token_type",
-    "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
-    "JTI_CLAIM": "jti",
-    "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
-    "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
-    "TOKEN_VERIFY_SERIALIZER": "rest_framework_simplejwt.serializers.TokenVerifySerializer",
-    "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",
-    "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
-    "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
-}
-
-
 logger = logging.getLogger(__name__)
 
 LOG_LEVEL = "INFO"
@@ -390,3 +355,8 @@ JAZZMIN_SETTINGS = {
     },
     # "related_modal_active": True # Won't work in some browsers
 }
+
+
+EMAIL_OTP_EXPIRE_SECONDS = config("EMAIL_OTP_EXPIRE_SECONDS")
+ACCESS_TOKEN_EXPIRE_MINUTES = config("ACCESS_TOKEN_EXPIRE_MINUTES")
+REFRESH_TOKEN_EXPIRE_MINUTES = config("REFRESH_TOKEN_EXPIRE_MINUTES")
