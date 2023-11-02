@@ -117,13 +117,17 @@ class LogoutView(APIView):
         description="Log out the currently authenticated user.",
     )
     def post(self, request):
-        # You can access the user's JWT token from the request
+        # Access the user's JWT token from the request (if it exists)
         token = request.auth
 
-        # Blacklist the token using your Authentication class
         if token:
+            # Blacklist the token using Authentication class
             Authentication.blacklist_token(token)
+
+        # Log the user out
         logout(request)
+
+        # Return a response indicating successful logout
         return Response(
             data={"status": "success", "message": "User logged out successfully."},
             status=status.HTTP_200_OK,

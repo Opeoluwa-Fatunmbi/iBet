@@ -65,6 +65,7 @@ class Jwt(BaseModel):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     access = models.TextField()
     refresh = models.TextField()
+    blacklisted = models.BooleanField(default=False)
 
 
 class Otp(BaseModel):
