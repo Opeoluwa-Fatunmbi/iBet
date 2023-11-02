@@ -31,7 +31,7 @@ class Authentication:  # create Authentication class
             algorithm=ALGORITHM,
         )
 
-    # deocde access token from header
+    # decode access token from header
     def decode_jwt(token: str):
         try:
             decoded = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
@@ -51,4 +51,19 @@ class Authentication:  # create Authentication class
         )
         if not jwt_obj:
             return None
+        return jwt_obj.user
+
+    def blacklist_token(token: str):  # blacklist token
+        decoded = Authentication.decode_jwt(token[7:])
+        if not decoded:
+            return None
+        jwt_obj = (
+            Jwt.objects.filter(user_id=decoded["user_id"])
+            .select_related("user", "user__avatar")
+            .first()
+        )
+        if not jwt_obj:
+            return None
+        jwt_obj.blacklisted = True
+        jwt_obj.save()
         return jwt_obj.user

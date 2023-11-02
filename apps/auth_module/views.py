@@ -117,6 +117,12 @@ class LogoutView(APIView):
         description="Log out the currently authenticated user.",
     )
     def post(self, request):
+        # You can access the user's JWT token from the request
+        token = request.auth
+
+        # Blacklist the token using your Authentication class
+        if token:
+            Authentication.blacklist_token(token)
         logout(request)
         return Response(
             data={"status": "success", "message": "User logged out successfully."},
@@ -138,24 +144,14 @@ class VerifyEmailView(APIView):
         email = serializer.validated_data["email"]
         otp_code = serializer.validated_data["otp"]
 
-        try:
-            user = CustomUser.objects.get(email=email)
-        except CustomUser.DoesNotExist:
-            return Response(
-                {"error": "User not found"}, status=status.HTTP_404_NOT_FOUND
-            )
+        user = get_object_or_404(CustomUser, email=email)
 
         if user.is_email_verified:
             return Response(
-                {"error": "Email already verified"}, status=status.HTTP_400_BAD_REQUEST
+                {"error": "Email already verified"}, status=status.HTTP_409_CONFLICT
             )
 
-        try:
-            otp = Otp.objects.get(user=user)
-        except Otp.DoesNotExist:
-            return Response(
-                {"error": "OTP not found"}, status=status.HTTP_404_NOT_FOUND
-            )
+        otp = get_object_or_404(Otp, user=user)
 
         if otp.code != otp_code:
             return Response(
