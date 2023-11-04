@@ -1,6 +1,6 @@
 from django.db import models
 from apps.core.models import BaseModel
-from apps.auth_module.models import CustomUser
+from apps.auth_module.models import User
 
 # Billing models
 
@@ -11,7 +11,7 @@ class Transaction(BaseModel):
         WITHDRAWAL = "WITHDRAWAL", "Withdrawal"
 
     user = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, related_name="transactions"
+        User, on_delete=models.CASCADE, related_name="transactions"
     )
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     transaction_type = models.CharField(

@@ -102,14 +102,6 @@ AUTHENTICATION_BACKENDS = [
 
 SITE_ID = 1
 
-# CLOUDINARY
-cloudinary.config(
-    cloud_name=config("CLOUD_NAME"),
-    api_key=config("API_KEY"),
-    api_secret=config("API_SECRET"),
-    secure=True,
-)
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -144,14 +136,27 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static/")]
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "static/media/")
+
+
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": config("CLOUDINARY_CLOUD_NAME"),
+    "API_KEY": config("CLOUDINARY_API_KEY"),
+    "API_SECRET": config("CLOUDINARY_API_SECRET"),
+}
+
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-AUTH_USER_MODEL = "auth_module.CustomUser"
+AUTH_USER_MODEL = "auth_module.User"
 
 
 REST_USE_JWT = True
@@ -184,21 +189,9 @@ EMAIL_HOST_USER = config("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
 # EMAIL_USE_SSL = config("EMAIL_USE_SSL")
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
-
-
 EMAIL_OTP_EXPIRE_SECONDS = config("EMAIL_OTP_EXPIRE_SECONDS")
 ACCESS_TOKEN_EXPIRE_MINUTES = config("ACCESS_TOKEN_EXPIRE_MINUTES")
 REFRESH_TOKEN_EXPIRE_MINUTES = config("REFRESH_TOKEN_EXPIRE_MINUTES")
-
-
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-STATIC_URL = "/static/"
-MEDIA_URL = "/media/"
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static/"),
-]
-
-MEDIA_ROOT = os.path.join(BASE_DIR, "static/media")
 
 
 REST_AUTH = {
@@ -260,14 +253,17 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
 }
 
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
 
 JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)
-    "site_title": "IBET",
+    "site_title": "IBET ADMIN",
     # Title on the login screen (19 chars max) (defaults to current_admin_site.site_header if absent or None)
-    "site_header": "IBET V1",
+    "site_header": "IBET ADMIN",
     # Logo to use for your site, must be present in static files, used for brand on top left
-    # "site_logo": "media/banner2-icon3.png",
+    "site_logo": "media/logo.png",
     # CSS classes that are applied to the logo above
     "site_logo_classes": "img-circle",
     # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
@@ -275,11 +271,11 @@ JAZZMIN_SETTINGS = {
     # Relative path to a favicon for your site, will default to site_logo if absent (ideally 32x32 px)
     "site_icon": "media/logo.png",
     # Welcome text on the login screen
-    "welcome_sign": "Welcome to iBet!",
+    "welcome_sign": "Welcome to iBet Admin Section",
     # Copyright on the footer
-    "copyright": "iBet Copyright",
+    "copyright": "iBet Ltd",
     # The model admin to search from the search bar, search bar omitted if excluded
-    "search_model": "auth_module.CustomUser",
+    "search_model": "auth_model.User",
     # Field name on user model that contains avatar ImageField/URLField/Charfield or a callable that receives the user
     "user_avatar": "avatar",
     ############
@@ -297,19 +293,19 @@ JAZZMIN_SETTINGS = {
         # {"model": "accounts.User"},
         # App with dropdown menu to all its models pages (Permissions checked against models)
         {"app": "auth_module"},
-        {"app": "core"},
-        {"app": "game"},
-        {"app": "betting"},
-        {"app": "mediation"},
         {"app": "billing"},
+        {"app": "betting"},
+        {"app": "game"},
+        {"app": "mediation"},
+        {"app": "sites"},
     ],
     #############
     # User Menu #
     #############
     # Additional links to include in the user menu on the top right ("app" url type is not allowed)
     "usermenu_links": [
-        {"name": "iBet V1 FrontPage", "url": """FRONTEND_URL""", "new_window": True},
-        {"model": "accounts.user"},
+        {"name": "iBet FrontPage", "url": "/", "new_window": True},
+        {"model": "auth_module.user"},
     ],
     #############
     # Side Menu #
@@ -327,17 +323,8 @@ JAZZMIN_SETTINGS = {
     # Custom icons for side menu apps/models See https://fontawesome.com/icons?d=gallery&m=free&v=5.0.0,5.0.1,5.0.10,5.0.11,5.0.12,5.0.13,5.0.2,5.0.3,5.0.4,5.0.5,5.0.6,5.0.7,5.0.8,5.0.9,5.1.0,5.1.1,5.2.0,5.3.0,5.3.1,5.4.0,5.4.1,5.4.2,5.13.0,5.12.0,5.11.2,5.11.1,5.10.0,5.9.0,5.8.2,5.8.1,5.7.2,5.7.1,5.7.0,5.6.3,5.5.0,5.4.2
     # for the full list of 5.13.0 free icon classes
     "icons": {
-        "accounts.Group": "fas fa-users",
-        "accounts.user": "fas fa-user-cog",
-        "common.file": "fas fa-image",
-        "common.guestuser": "fas fa-users",
-        "general.sitedetail": "fas fa-info-circle",
-        "general.subscriber": "fas fa-users",
-        "general.review": "fas fa-comments",
-        "listings.category": "fas fa-list",
-        "listings.listing": "fas fa-list-alt",
-        "listings.bid": "fas fa-dollar-sign",
-        "listings.watchlist": "fas fa-heart",
+        "auth.Group": "fas fa-users",
+        "auth.user": "fas fa-user-cog",
         "sites.site": "fas fa-globe",
     },
     # Icons that are used when one is not manually specified

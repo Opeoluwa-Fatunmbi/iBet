@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.auth_module.models import CustomUser
+from apps.auth_module.models import User
 from django.utils.translation import gettext_lazy as _
 
 
@@ -29,12 +29,12 @@ class RegisterSerializer(serializers.Serializer):
         terms_agreement = validated_data["terms_agreement"]
 
         # Check if the email is already in use
-        if CustomUser.objects.filter(email=email).exists():
+        if User.objects.filter(email=email).exists():
             raise serializers.ValidationError(
                 {"email": "This email is already registered"}
             )
 
-        user = CustomUser.objects.create_user(
+        user = User.objects.create_user(
             email=email, password=password, terms_agreement=terms_agreement
         )
         return user

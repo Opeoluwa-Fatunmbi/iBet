@@ -12,7 +12,7 @@ from drf_spectacular.utils import extend_schema
 from django.shortcuts import get_object_or_404
 from rest_framework.throttling import UserRateThrottle
 from django.contrib.auth import authenticate, login, logout
-from apps.auth_module.models import CustomUser, Otp, Jwt
+from apps.auth_module.models import User, Otp, Jwt
 from apps.auth_module.serializers import (
     RegisterSerializer,
     VerifyOtpSerializer,
@@ -42,7 +42,7 @@ class RegisterView(APIView):
                 data = serializer.validated_data
 
                 async def check_existing_user(email):
-                    existing_user = await CustomUser.objects.filter(email=email).first()
+                    existing_user = await User.objects.filter(email=email).first()
                     return existing_user
 
                 # Call the asynchronous function directly
@@ -148,7 +148,7 @@ class VerifyEmailView(APIView):
         email = serializer.validated_data["email"]
         otp_code = serializer.validated_data["otp"]
 
-        user = get_object_or_404(CustomUser, email=email)
+        user = get_object_or_404(User, email=email)
 
         if user.is_email_verified:
             return Response(
@@ -191,8 +191,8 @@ class ResendVerificationEmailView(APIView):
         if serializer.is_valid():
             email = serializer.validated_data["email"]
             try:
-                user = CustomUser.objects.get(email=email)
-            except CustomUser.DoesNotExist:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
                 return Response(
                     {"error": "User not found"}, status=status.HTTP_404_NOT_FOUND
                 )
@@ -223,8 +223,8 @@ class SendPasswordResetOtpView(APIView):
         if serializer.is_valid():
             email = serializer.validated_data["email"]
             try:
-                user = CustomUser.objects.get(email=email)
-            except CustomUser.DoesNotExist:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
                 return Response(
                     {"error": "User not found"}, status=status.HTTP_404_NOT_FOUND
                 )
@@ -253,7 +253,7 @@ class SetNewPasswordView(APIView):
             password = data["password"]
 
             # Use get_object_or_404 for user and OTP retrieval
-            user = get_object_or_404(CustomUser, email=email)
+            user = get_object_or_404(User, email=email)
             otp = get_object_or_404(Otp, user=user)
 
             if otp.code != code:

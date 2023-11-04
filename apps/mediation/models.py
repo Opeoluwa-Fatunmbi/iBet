@@ -1,5 +1,5 @@
 from django.db import models
-from apps.auth_module.models import CustomUser
+from apps.auth_module.models import User
 from apps.betting.models import Bet
 from apps.core.models import BaseModel
 from django.utils.translation import gettext_lazy as _
@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 # Mediation models
 class Mediator(BaseModel):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     mediation_experience = models.PositiveIntegerField(default=0)
     fees = models.DecimalField(_("Fees"), max_digits=10, decimal_places=2, default=0.00)
 

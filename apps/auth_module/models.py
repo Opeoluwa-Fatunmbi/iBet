@@ -1,75 +1,60 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
-from apps.auth_module.managers import CustomUserManager
-from apps.core.models import BaseModel
+import uuid
+from .managers import UserManager
 from django.conf import settings
 from django.utils import timezone
-import uuid
+from apps.auth_module.models import BaseModel
+
+# Create your models here.
 
 
-class CustomUser(AbstractBaseUser, PermissionsMixin):
+class User(AbstractBaseUser, PermissionsMixin):
     class ROLES_CHOICES(models.TextChoices):
         PLAYER = "PLAYER", _("Player")
         MEDIATOR = "MEDIATOR", _("Mediator")
 
     id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, unique=True, editable=False
+        default=uuid.uuid4(), primary_key=True, unique=True, editable=False
     )
+    first_name = models.CharField(_("first_name"), max_length=50)
+    last_name = models.CharField(_("last_name"), max_length=50)
+    email = models.EmailField(_("Email_address"), unique=True)
+    is_staff = models.BooleanField(_("staff_status"), default=False)
+    is_active = models.BooleanField(_("active"), default=True)
+    created_at = models.DateTimeField(_("created_at"), auto_now_add=True)
+    updated_at = models.DateTimeField(_("updated_at"), auto_now=True)
     role = models.CharField(
-        _("Role Choices"),
-        max_length=50,
-        choices=ROLES_CHOICES.choices,
-        default=ROLES_CHOICES.PLAYER,
+        _("role"), max_length=50, choices=ROLES_CHOICES.choices, default="PLAYER"
     )
-    username = None
-    email = models.EmailField(_("email address"), unique=True)
-    first_name = models.CharField(max_length=50, default="John")
-    last_name = models.CharField(max_length=50, default="Doe")
-    date_of_birth = models.DateField(_("date of birth"), null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    is_email_verified = models.BooleanField(default=False)
-    terms_agreement = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(_("superuser_status"), default=False)
+    is_email_verified = models.BooleanField(_("email_verified"), default=False)
+    terms_agreement = models.BooleanField(_("terms_agreement"), default=False)
+    avatar = models.ImageField(upload_to="avatars/", null=True)
+
+    objects = UserManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
-
-    objects = CustomUserManager()
-
-    is_staff = models.BooleanField(
-        _("staff status"),
-        default=False,
-        help_text=_("Designates whether the user can log into this admin site."),
-    )
-    is_superuser = models.BooleanField(
-        _("superuser status"),
-        default=False,
-        help_text=_("Designates whether the user has all permissions."),
-    )
-    is_active = models.BooleanField(default=True)
-
-    def __str__(self) -> str:
-        return self.email
-
-    class Meta:
-        verbose_name = "User"
-        verbose_name_plural = "Users"
+    REQUIRED_FIELDS = ["first_name", "last_name"]
 
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
 
+    def __str__(self):
+        return self.full_name
+
 
 class Jwt(BaseModel):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     access = models.TextField()
     refresh = models.TextField()
     blacklisted = models.BooleanField(default=False)
 
 
 class Otp(BaseModel):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     code = models.IntegerField()
 
     def check_expiration(self):

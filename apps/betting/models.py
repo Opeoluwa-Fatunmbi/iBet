@@ -1,5 +1,5 @@
 from django.db import models
-from apps.auth_module.models import CustomUser
+from apps.auth_module.models import User
 from apps.core.models import BaseModel
 from django.utils.translation import gettext_lazy as _
 
@@ -22,14 +22,14 @@ class Match(models.Model):
         default=MATCH_STATUS_CHOICES.SCHEDULED,
     )
     winner = models.ForeignKey(
-        CustomUser,
+        User,
         on_delete=models.CASCADE,
         related_name="match_winner",
         null=True,
         blank=True,
     )
     loser = models.ForeignKey(
-        CustomUser,
+        User,
         on_delete=models.CASCADE,
         related_name="match_loser",
         null=True,
@@ -50,7 +50,7 @@ class Match(models.Model):
 
 
 class Bet(BaseModel):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
     amount = models.DecimalField(_("Amount"), max_digits=10, decimal_places=2)
     is_winner = models.BooleanField(default=False)
@@ -65,7 +65,7 @@ class Bet(BaseModel):
 
 class Outcome(BaseModel):
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
-    winner = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    winner = models.ForeignKey(User, on_delete=models.CASCADE)
     winning_amount = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):

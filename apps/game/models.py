@@ -1,5 +1,5 @@
 from django.db import models
-from apps.auth_module.models import CustomUser
+from apps.auth_module.models import User
 from django.utils.translation import gettext_lazy as _
 from apps.core.models import BaseModel
 
@@ -39,7 +39,7 @@ class Game(BaseModel):
 
 
 class Player(BaseModel):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     score = models.PositiveIntegerField(default=0)
     experience_level = models.CharField(max_length=50, blank=True, null=True)
 
