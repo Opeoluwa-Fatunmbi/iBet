@@ -319,8 +319,18 @@ JAZZMIN_SETTINGS = {
     # for the full list of 5.13.0 free icon classes
     "icons": {
         "auth.Group": "fas fa-users",
-        "auth.user": "fas fa-user-cog",
+        "auth_module.user": "fas fa-user-cog",
         "sites.site": "fas fa-globe",
+        "betting.bet": "fas fa-trophy",
+        "betting.match": "fas fa-futbol",
+        "betting.outcome": "fas fa-check",
+        "billing.transaction": "fas fa-dollar-sign",
+        "game.game": "fas fa-gamepad",
+        "auth_module.user": "fas fa-user",
+        "auth_module.user": "fas fa-users",
+        "mediation.mediator": "fas fa-gavel",
+        "mediation.mediation": "fas fa-balance-scale",
+        "game.player": "fas fa-user",
     },
     # Icons that are used when one is not manually specified
     "default_icon_parents": "fas fa-chevron-circle-right",
