@@ -12,3 +12,19 @@ class BaseModel(models.Model):  # create BaseModel class
 
     class Meta:
         abstract = True
+
+
+class File(BaseModel):  # create File class
+    resource_type = models.CharField(max_length=255)  # set mime_type field
+
+    def __str__(self):
+        return self.name
+
+
+class GuestUser(BaseModel):
+    def __str__(self) -> str:
+        return str(self.id)
+
+    @property
+    def is_authenticated(self):
+        return True
