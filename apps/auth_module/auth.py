@@ -1,5 +1,5 @@
 from django.conf import settings  # import the settings file
-from apps.auth_module.models import Jwt  # import the Jwt model
+from apps.auth_module.models import *  # import the Jwt model
 from datetime import datetime, timedelta  # import datetime and timedelta
 import jwt, random, string  # import jwt, random and string
 

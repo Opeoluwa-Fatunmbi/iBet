@@ -13,8 +13,6 @@ django-debug-toolbar==4.1.0
 django-jazzmin==2.6.0
 djangorestframework==3.14.0
 djangorestframework-api-key==2.3.0
-djangorestframework-jwt==1.11.0
-djangorestframework-simplejwt==5.2.2
 drf-yasg==1.21.7
 idna==3.4
 inflection==0.5.1

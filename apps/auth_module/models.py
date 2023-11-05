@@ -5,7 +5,7 @@ import uuid
 from .managers import UserManager
 from django.conf import settings
 from django.utils import timezone
-from apps.auth_module.models import BaseModel
+from apps.core.models import BaseModel
 
 # Create your models here.
 

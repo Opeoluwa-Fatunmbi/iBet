@@ -7,6 +7,7 @@ from drf_spectacular.views import (
 )
 from django.conf.urls.static import static
 from django.conf import settings
+import debug_toolbar
 
 
 urlpatterns = [
@@ -28,6 +29,8 @@ urlpatterns = [
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-ui",
     ),
+    # Debug Toolbar
+    path("__debug__/", include(debug_toolbar.urls)),
 ]
 
 
