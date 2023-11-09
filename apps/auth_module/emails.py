@@ -3,7 +3,6 @@ from django.core.mail import EmailMessage
 from apps.auth_module import models as accounts_models
 import random
 import threading
-import asgiref.sync
 
 
 class EmailThread(threading.Thread):
@@ -24,8 +23,8 @@ class Util:
         return otp
 
     @staticmethod
-    async def send_activation_otp(user):
-        otp = await asgiref.sync.sync_to_async(Util.get_or_create_otp)(user)
+    def send_activation_otp(user):
+        otp = Util.get_or_create_otp(user)
 
         subject = "Verify your email"
         message = render_to_string(
@@ -41,8 +40,8 @@ class Util:
         EmailThread(email_message).start()
 
     @staticmethod
-    async def send_password_change_otp(user):
-        otp = await asgiref.sync.sync_to_async(Util.get_or_create_otp)(user)
+    def send_password_change_otp(user):
+        otp = Util.get_or_create_otp(user)
 
         subject = "Your account password reset email"
         message = render_to_string(

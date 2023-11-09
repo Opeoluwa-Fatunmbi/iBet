@@ -11,11 +11,18 @@ from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from drf_spectacular.utils import extend_schema
 from django.shortcuts import get_object_or_404
 from rest_framework.throttling import UserRateThrottle
+from apps.core.utils import is_uuid
+from apps.betting.models import Match, Bet, Outcome
+from apps.core.exceptions import RequestError
+from apps.core.responses import CustomResponse
+from apps.core.models import File
+from apps.core.models import GuestUser
 from django.contrib.auth import authenticate, login, logout
 from apps.auth_module.models import User, Otp, Jwt
 from apps.auth_module.serializers import (
     RegisterSerializer,
     VerifyOtpSerializer,
+    LoginSerializer,
     ResendOtpSerializer,
     RefreshSerializer,
     SetNewPasswordSerializer,
@@ -23,6 +30,7 @@ from apps.auth_module.serializers import (
 from .emails import Util
 from rest_framework.exceptions import ValidationError
 from apps.auth_module.auth import Authentication
+from rest_framework.exceptions import NotFound, AuthenticationFailed
 
 
 class RegisterView(APIView):
@@ -33,7 +41,7 @@ class RegisterView(APIView):
         summary="Register a new user",
         description="This endpoint registers new users into our application",
     )
-    async def post(self, request):
+    def post(self, request):
         serializer = self.serializer_class(data=request.data)
 
         try:
@@ -41,12 +49,11 @@ class RegisterView(APIView):
                 serializer.is_valid(raise_exception=True)
                 data = serializer.validated_data
 
-                async def check_existing_user(email):
-                    existing_user = await User.objects.filter(email=email).first()
+                def check_existing_user(email):
+                    existing_user = User.objects.filter(email=email).first()
                     return existing_user
 
-                # Call the asynchronous function directly
-                existing_user = await check_existing_user(data["email"])
+                existing_user = check_existing_user(data["email"])
 
                 if existing_user:
                     response_data = {
@@ -58,14 +65,21 @@ class RegisterView(APIView):
                 # Create user
                 user = serializer.save()
                 # Send verification email
-                await Util.send_activation_otp(user)
+                Util.send_activation_otp(user)
 
                 response_data = {
                     "status": "success",
-                    "message": "Account created successfully. Please check your email for a confirmation link.",
-                    "data": serializer.data,
+                    "message": "Account created successfully. Please check your email for OTP.",
+                    "data": {
+                        "first_name": data["first_name"],
+                        "last_name": data["last_name"],
+                        "email": data["email"],
+                        "terms_agreement": data["terms_agreement"],
+                    },
                 }
-                return Response(response_data, status=status.HTTP_201_CREATED)
+                return CustomResponse.success(
+                    response_data, status=status.HTTP_201_CREATED
+                )
 
         except IntegrityError as e:
             # Handle database integrity error (e.g., unique constraint violation)
@@ -74,7 +88,9 @@ class RegisterView(APIView):
                 "message": "Account not created",
                 "error_message": str(e),
             }
-            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+            return CustomResponse.error(
+                response_data, status=status.HTTP_400_BAD_REQUEST
+            )
         except Exception as e:
             # Handle other exceptions
             response_data = {
@@ -82,31 +98,47 @@ class RegisterView(APIView):
                 "message": "Account not created",
                 "error_message": str(e),
             }
-            return Response(response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return CustomResponse.error(
+                response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class LoginView(APIView):
+    serializer_class = LoginSerializer
+
     @extend_schema(
         summary="User Login",
         description="Authenticate and log in a user.",
     )
     def post(self, request):
-        username = request.data.get("username")
-        password = request.data.get("password")
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        user = authenticate(request, username=username, password=password)
+        email = serializer.validated_data["email"]
+        password = serializer.validated_data["password"]
 
-        if user is not None:
-            login(request, user)
-            return Response(
-                data={"status": "success", "message": "User logged in successfully."},
-                status=status.HTTP_200_OK,
+        try:
+            user = User.objects.get(email=email)
+            if not user.check_password(password):
+                raise AuthenticationFailed("Invalid credentials")
+
+            if not user.is_email_verified:
+                raise AuthenticationFailed("Verify your email first")
+
+            Jwt.objects.filter(user_id=user.id).delete()
+
+            access = Authentication.create_access_token({"user_id": str(user.id)})
+            refresh = Authentication.create_refresh_token()
+            Jwt.objects.create(user_id=user.id, access=access, refresh=refresh)
+
+            return CustomResponse.success(
+                message="Login successful",
+                data={"access": access, "refresh": refresh},
+                status_code=201,
             )
-        else:
-            return Response(
-                data={"status": "error", "message": "Invalid username or password."},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
+
+        except User.DoesNotExist:
+            raise NotFound("User not found")
 
 
 class LogoutView(APIView):

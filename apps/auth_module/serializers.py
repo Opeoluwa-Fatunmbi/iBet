@@ -4,6 +4,8 @@ from django.utils.translation import gettext_lazy as _
 
 
 class RegisterSerializer(serializers.Serializer):
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
     email = serializers.EmailField()
     password = serializers.CharField(
         min_length=8, error_messages={"min_length": _("{min_length} characters min.")}
@@ -24,6 +26,8 @@ class RegisterSerializer(serializers.Serializer):
         return attrs
 
     def create(self, validated_data):
+        first_name = validated_data["first_name"]
+        last_name = validated_data["last_name"]
         email = validated_data["email"]
         password = validated_data["password"]
         terms_agreement = validated_data["terms_agreement"]
@@ -35,7 +39,11 @@ class RegisterSerializer(serializers.Serializer):
             )
 
         user = User.objects.create_user(
-            email=email, password=password, terms_agreement=terms_agreement
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            password=password,
+            terms_agreement=terms_agreement,
         )
         return user
 

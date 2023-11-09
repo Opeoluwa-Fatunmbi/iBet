@@ -2,7 +2,6 @@ from django.utils import timezone
 from rest_framework.permissions import BasePermission
 from apps.auth_module.auth import Authentication
 from apps.auth_module.models import User, Jwt
-from apps.listings.models import Category, Listing
 from apps.core.models import File, GuestUser
 from apps.core.exceptions import RequestError
 
@@ -106,23 +105,3 @@ class TestUtil:
         refresh = Authentication.create_refresh_token()
         Jwt.objects.create(user_id=verified_user.id, access=access, refresh=refresh)
         return access
-
-    def create_listing(verified_user):
-        # Create Category
-        category = Category.objects.create(name="TestCategory")
-
-        # Create File
-        file = File.objects.create(resource_type="image/jpeg")
-
-        # Create Listing
-        listing_dict = {
-            "auctioneer_id": verified_user.id,
-            "name": "New Listing",
-            "desc": "New description",
-            "category": category,
-            "price": 1000.00,
-            "closing_date": timezone.now() + timedelta(days=1),
-            "image_id": file.id,
-        }
-        listing = Listing.objects.create(**listing_dict)
-        return {"user": verified_user, "listing": listing, "category": category}
