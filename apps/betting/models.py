@@ -4,7 +4,9 @@ from apps.core.models import BaseModel
 from django.utils.translation import gettext_lazy as _
 
 
-class Match(models.Model):
+
+
+class Match(BaseModel):
     class MATCH_STATUS_CHOICES(models.TextChoices):
         SCHEDULED = "SCHEDULED", _("Scheduled")
         IN_PROGRESS = "IN_PROGRESS", _("In Progress")
@@ -13,7 +15,6 @@ class Match(models.Model):
     match_date = models.DateTimeField(
         _("Match Date"), auto_now=False, auto_now_add=False
     )
-    game_type = models.CharField(_("Game Type"), max_length=100)
     location = models.CharField(_("Location"), max_length=100)
     status = models.CharField(
         _("Status"),
@@ -67,6 +68,7 @@ class Outcome(BaseModel):
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
     winner = models.ForeignKey(User, on_delete=models.CASCADE)
     winning_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    
 
     def __str__(self):
         return f"{self.match} - Winner: {self.winner}"
