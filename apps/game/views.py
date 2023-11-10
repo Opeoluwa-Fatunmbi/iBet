@@ -9,18 +9,25 @@ from rest_framework.response import Response
 
 class GameList(APIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = GameSerializer
 
     @extend_schema(
         summary="Get a list of games",
         description="Retrieve a list of all available games.",
     )
     def get(self, request):
-        games = Game.objects.all()
-        serializer = GameSerializer(games, many=True)
-        return Response(
-            data={"status": "success", "data": serializer.data},
-            status=status.HTTP_200_OK,
-        )
+        try:
+            games = Game.objects.all()
+            serializer = GameSerializer(games, many=True)
+            return Response(
+                data={"status": "success", "data": serializer.data},
+                status=status.HTTP_200_OK,
+            )
+        except Exception as e:
+            return Response(
+                data={"status": "error", "error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 class CreateGame(APIView):

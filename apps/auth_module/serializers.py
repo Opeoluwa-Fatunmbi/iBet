@@ -3,6 +3,27 @@ from apps.auth_module.models import User
 from django.utils.translation import gettext_lazy as _
 
 
+class UserSerializer(serializers.Serializer):
+    password = serializers.CharField(write_only=True)
+    email = serializers.EmailField(allow_blank=True, allow_null=True)
+    first_name = serializers.CharField(max_length=50, allow_blank=True, allow_null=True)
+    last_name = serializers.CharField(max_length=50, allow_blank=True, allow_null=True)
+    terms_agreement = serializers.BooleanField(default=False)
+
+    def create(self, validated_data):
+        return User.objects.create_user(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.email = validated_data.get("email", instance.email)
+        instance.first_name = validated_data.get("first_name", instance.first_name)
+        instance.last_name = validated_data.get("first_name", instance.last_name)
+        instance.terms_agreement = validated_data.get(
+            "terms_agreement", instance.terms_agreement
+        )
+        instance.save()
+        return instance
+
+
 class RegisterSerializer(serializers.Serializer):
     first_name = serializers.CharField()
     last_name = serializers.CharField()
