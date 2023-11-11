@@ -12,6 +12,8 @@ import debug_toolbar
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    # path('admin/defender/', include('defender.urls')), # defender admin
+    # Apps
     path("api/v1/auth/", include("apps.auth_module.urls")),
     path("api/v1/betting/", include("apps.betting.urls")),
     path("api/v1/game/", include("apps.game.urls")),

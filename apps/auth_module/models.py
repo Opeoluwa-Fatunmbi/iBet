@@ -63,3 +63,6 @@ class Otp(BaseModel):
         if diff.total_seconds() > int(settings.EMAIL_OTP_EXPIRE_SECONDS):
             return True
         return False
+
+    def __str__(self):
+        return f"{self.user.full_name} - {self.code}"

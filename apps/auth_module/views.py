@@ -60,7 +60,7 @@ class RegisterView(APIView):
                         "status": "Invalid Entry",
                         "message": "Email already registered!",
                     }
-                    return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+                    return CustomResponse.error(response_data, status_code=400)
 
                 # Create user
                 user = serializer.save()
@@ -77,9 +77,7 @@ class RegisterView(APIView):
                         "terms_agreement": data["terms_agreement"],
                     },
                 }
-                return CustomResponse.success(
-                    response_data, status=status.HTTP_201_CREATED
-                )
+                return CustomResponse.success(response_data, status_code=400)
 
         except IntegrityError as e:
             # Handle database integrity error (e.g., unique constraint violation)
@@ -88,9 +86,7 @@ class RegisterView(APIView):
                 "message": "Account not created",
                 "error_message": str(e),
             }
-            return CustomResponse.error(
-                response_data, status=status.HTTP_400_BAD_REQUEST
-            )
+            return CustomResponse.error(response_data, status_code=400)
         except Exception as e:
             # Handle other exceptions
             response_data = {
@@ -98,13 +94,12 @@ class RegisterView(APIView):
                 "message": "Account not created",
                 "error_message": str(e),
             }
-            return CustomResponse.error(
-                response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+            return CustomResponse.error(response_data, status_code=500)
 
 
 class LoginView(APIView):
     serializer_class = LoginSerializer
+    throttle_classes = [UserRateThrottle]
 
     @extend_schema(
         summary="User Login",

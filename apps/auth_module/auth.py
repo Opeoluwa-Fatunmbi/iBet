@@ -53,17 +53,14 @@ class Authentication:  # create Authentication class
             return None
         return jwt_obj.user
 
-    def blacklist_token(token: str):  # blacklist token
-        decoded = Authentication.decode_jwt(token[7:])
+    # Blacklist refresh token
+    def blacklist_token(token: str):
+        decoded = Authentication.decode_jwt(token)
         if not decoded:
             return None
-        jwt_obj = (
-            Jwt.objects.filter(user_id=decoded["user_id"])
-            .select_related("user", "user__avatar")
-            .first()
-        )
+        jwt_obj = Jwt.objects.filter(user_id=decoded["user_id"]).first()
         if not jwt_obj:
             return None
         jwt_obj.blacklisted = True
         jwt_obj.save()
-        return jwt_obj.user
+        return True
