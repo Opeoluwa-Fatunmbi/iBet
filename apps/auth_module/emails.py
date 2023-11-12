@@ -81,3 +81,16 @@ class Util:
         email_message = EmailMessage(subject=subject, body=message, to=[user.email])
         email_message.content_subtype = "html"
         EmailThread(email_message).start()
+
+    @staticmethod
+    def match_created(user):
+        subject = "Match Created!"
+        message = render_to_string(
+            "match_created.html",
+            {
+                "name": user.full_name,
+            },
+        )
+        email_message = EmailMessage(subject=subject, body=message, to=[user.email])
+        email_message.content_subtype = "html"
+        EmailThread(email_message).start()

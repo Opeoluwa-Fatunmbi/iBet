@@ -2,11 +2,10 @@ from rest_framework import serializers
 from apps.betting.models import Match, Bet, Outcome
 
 
-class MatchSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
+class CreateMatchSerializer(serializers.Serializer):
     winner = serializers.CharField(max_length=100)
     loser = serializers.CharField(max_length=100)
-    location = serializers.CharField(max_length=100)
+    mediator = serializers.CharField(max_length=100)
 
     def create(self, validated_data):
         return Match.objects.create(**validated_data)

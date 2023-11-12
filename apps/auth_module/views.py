@@ -155,9 +155,9 @@ class LogoutView(APIView):
         logout(request)
 
         # Return a response indicating successful logout
-        return Response(
+        return CustomResponse.success(
             data={"status": "success", "message": "User logged out successfully."},
-            status=status.HTTP_200_OK,
+            status=200,
         )
 
 
@@ -178,21 +178,15 @@ class VerifyEmailView(APIView):
         user = get_object_or_404(User, email=email)
 
         if user.is_email_verified:
-            return Response(
-                {"error": "Email already verified"}, status=status.HTTP_409_CONFLICT
-            )
+            return CustomResponse.error({"error": "Email already verified"}, status=409)
 
         otp = get_object_or_404(Otp, user=user)
 
         if otp.code != otp_code:
-            return Response(
-                {"error": "Incorrect OTP"}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return CustomResponse.error({"error": "Incorrect OTP"}, status=400)
 
         if otp.check_expiration():
-            return Response(
-                {"error": "Expired OTP"}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return CustomResponse.error({"error": "Expired OTP"}, status=400)
 
         user.is_email_verified = True
         user.save()
@@ -201,8 +195,8 @@ class VerifyEmailView(APIView):
         # Send welcome email
         Util.welcome_email(user)
 
-        return Response(
-            {"message": "Account verification successful"}, status=status.HTTP_200_OK
+        return CustomResponse.success(
+            {"message": "Account verification successful"}, status=200
         )
 
 
@@ -220,22 +214,20 @@ class ResendVerificationEmailView(APIView):
             try:
                 user = User.objects.get(email=email)
             except User.DoesNotExist:
-                return Response(
-                    {"error": "User not found"}, status=status.HTTP_404_NOT_FOUND
-                )
+                return CustomResponse.error({"error": "User not found"}, status=404)
 
             if user.is_email_verified:
-                return Response(
+                return CustomResponse.error(
                     {"error": "Email already verified"},
-                    status=status.HTTP_400_BAD_REQUEST,
+                    status=400,
                 )
 
             # Send verification email
             Util.send_activation_otp(user)
-            return Response(
-                {"message": "Verification email sent"}, status=status.HTTP_200_OK
+            return CustomResponse.success(
+                {"message": "Verification email sent"}, status=200
             )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return CustomResponse.error(serializer.errors, status=400)
 
 
 class SendPasswordResetOtpView(APIView):
@@ -252,16 +244,14 @@ class SendPasswordResetOtpView(APIView):
             try:
                 user = User.objects.get(email=email)
             except User.DoesNotExist:
-                return Response(
-                    {"error": "User not found"}, status=status.HTTP_404_NOT_FOUND
-                )
+                return CustomResponse.error({"error": "User not found"}, status=404)
 
             # Send password reset email
             Util.send_password_change_otp(user)
-            return Response(
-                {"message": "Password reset OTP sent"}, status=status.HTTP_200_OK
+            return CustomResponse.success(
+                {"message": "Password reset OTP sent"}, status=200
             )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return CustomResponse.error(serializer.errors, status=400)
 
 
 class SetNewPasswordView(APIView):
@@ -284,24 +274,20 @@ class SetNewPasswordView(APIView):
             otp = get_object_or_404(Otp, user=user)
 
             if otp.code != code:
-                return Response(
-                    {"error": "Incorrect OTP"}, status=status.HTTP_401_UNAUTHORIZED
-                )
+                return CustomResponse.error({"error": "Incorrect OTP"}, status=401)
 
             if otp.check_expiration():
-                return Response(
-                    {"error": "Expired OTP"}, status=status.HTTP_401_UNAUTHORIZED
-                )
+                return CustomResponse.error({"error": "Expired OTP"}, status=401)
 
             user.set_password(password)
             user.save()
             otp.delete()
 
-            return Response(
-                {"message": "Password reset successful"}, status=status.HTTP_200_OK
+            return CustomResponse.success(
+                {"message": "Password reset successful"}, status=200
             )
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return CustomResponse.error(serializer.errors, status=400)
 
 
 class RefreshTokensView(APIView):
@@ -320,16 +306,16 @@ class RefreshTokensView(APIView):
         jwt = Jwt.objects.filter(refresh=token).first()
 
         if not jwt:
-            return Response(
+            return CustomResponse.error(
                 {"error": "Refresh token does not exist"},
-                status=status.HTTP_404_NOT_FOUND,
+                status=404,
             )
 
         decoded_jwt = Authentication.decode_jwt(token)
         if not decoded_jwt:
-            return Response(
+            return CustomResponse.error(
                 {"error": "Refresh token is invalid or expired"},
-                status=status.HTTP_401_UNAUTHORIZED,
+                status=401,
             )
 
         access = Authentication.create_access_token({"user_id": str(jwt.user_id)})
@@ -341,4 +327,4 @@ class RefreshTokensView(APIView):
 
         response_data = {"access": access, "refresh": refresh}
 
-        return Response(response_data, status=status.HTTP_200_OK)
+        return CustomResponse.success(response_data, status=200)
