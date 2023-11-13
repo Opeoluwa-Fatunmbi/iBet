@@ -1,6 +1,5 @@
 from django.db import models
 from apps.auth_module.models import User
-from apps.betting.models import Bet
 from apps.core.models import BaseModel
 from django.utils.translation import gettext_lazy as _
 
@@ -20,7 +19,6 @@ class Mediator(BaseModel):
 
 
 class Mediation(BaseModel):
-    bet = models.OneToOneField(Bet, on_delete=models.CASCADE)
     mediator = models.ForeignKey(Mediator, on_delete=models.CASCADE)
     mediation_status = models.CharField(
         _("Mediation Status"), max_length=50, default="Pending"

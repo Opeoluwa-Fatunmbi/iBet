@@ -2,6 +2,7 @@ from django.db import models
 from apps.auth_module.models import User
 from apps.core.models import BaseModel
 from django.utils.translation import gettext_lazy as _
+from apps.mediation.models import Mediator
 
 
 class Match(BaseModel):
@@ -13,21 +14,20 @@ class Match(BaseModel):
     match_date = models.DateTimeField(
         _("Match Date"), auto_now=False, auto_now_add=False
     )
-    location = models.CharField(_("Location"), max_length=100)
     status = models.CharField(
         _("Status"),
         max_length=20,
         choices=MATCH_STATUS_CHOICES.choices,
         default=MATCH_STATUS_CHOICES.SCHEDULED,
     )
-    winner = models.ForeignKey(
+    player_1 = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name="match_winner",
         null=True,
         blank=True,
     )
-    loser = models.ForeignKey(
+    player_2 = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name="match_loser",
@@ -39,9 +39,10 @@ class Match(BaseModel):
         _("Duration (minutes)"), null=True, blank=True
     )
     notes = models.TextField(_("Notes"), blank=True)
+    mediator = models.OneToOneField(Mediator, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
-        return f"{self.game_type} Match on {self.match_date}"
+        return f"{self.player_1} vs {self.player_2}"
 
     class Meta:
         verbose_name = "Match"
@@ -49,13 +50,12 @@ class Match(BaseModel):
 
 
 class Bet(BaseModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    match = models.ForeignKey(Match, on_delete=models.CASCADE)
+    match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name="bets")
     amount = models.DecimalField(_("Amount"), max_digits=10, decimal_places=2)
     is_winner = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Bet by {self.user} on {self.match}"
+        return f"{self.match} - {self.amount}"
 
     class Meta:
         verbose_name = "Bet"
@@ -63,13 +63,18 @@ class Bet(BaseModel):
 
 
 class Outcome(BaseModel):
-    match = models.ForeignKey(Match, on_delete=models.CASCADE)
-    winner = models.ForeignKey(User, on_delete=models.CASCADE)
+    match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name="outcomes")
+    winner = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="winning_outcomes"
+    )
+    loser = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="losing_outcomes", default=None
+    )
     winning_amount = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
         return f"{self.match} - Winner: {self.winner}"
 
     class Meta:
-        verbose_name = "Match"
-        verbose_name_plural = "Matches"
+        verbose_name = "Outcome"
+        verbose_name_plural = "Outcomes"

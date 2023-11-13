@@ -23,8 +23,8 @@ env/
 *.logs
 logs/iBet.log
 # Media and static files
-media/
-static/
+
+
 
 # Compiled files
 *.pyc
