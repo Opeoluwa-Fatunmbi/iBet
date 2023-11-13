@@ -23,14 +23,14 @@ class Match(BaseModel):
     player_1 = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="match_winner",
+        related_name="match_player_1",
         null=True,
         blank=True,
     )
     player_2 = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="match_loser",
+        related_name="match_player_2",
         null=True,
         blank=True,
     )

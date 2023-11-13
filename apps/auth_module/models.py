@@ -16,7 +16,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         MEDIATOR = "MEDIATOR", _("Mediator")
 
     id = models.UUIDField(
-        default=uuid.uuid4(), primary_key=True, unique=True, editable=False
+        default=uuid.uuid4, primary_key=True, unique=True, editable=False
     )
     first_name = models.CharField(_("first_name"), max_length=50)
     last_name = models.CharField(_("last_name"), max_length=50)
