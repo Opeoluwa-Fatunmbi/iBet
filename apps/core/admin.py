@@ -3,5 +3,5 @@ from django.utils.safestring import mark_safe
 
 # Register your models here.
 admin.site.site_header = mark_safe(
-    '<strong style="font-family: sans-serif; font-weight:bold; color: #ffffff; font-size: 24px;">C.S. ADMIN</strong>'
+    '<strong style="font-family: sans-serif; font-weight:bold; color: #ffffff; font-size: 24px;">iBet ADMIN</strong>'
 )

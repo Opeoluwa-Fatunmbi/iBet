@@ -4,7 +4,7 @@ from apps.game.models import Game, Player
 from apps.game.serializers import GameSerializer, PlayerSerializer
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from drf_spectacular.views import extend_schema
-from rest_framework.response import Response
+from apps.core.responses import CustomResponse
 
 
 class GameList(APIView):
@@ -19,14 +19,14 @@ class GameList(APIView):
         try:
             games = Game.objects.all()
             serializer = GameSerializer(games, many=True)
-            return Response(
+            return CustomResponse.success(
                 data={"status": "success", "data": serializer.data},
-                status=status.HTTP_200_OK,
+                status=200,
             )
         except Exception as e:
-            return Response(
+            return CustomResponse.error(
                 data={"status": "error", "error": str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                status=500,
             )
 
 
@@ -41,21 +41,21 @@ class CreateGame(APIView):
         serializer = GameSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(
+            return CustomResponse.success(
                 data={
                     "status": "success",
                     "message": "Game created successfully",
                     "data": serializer.data,
                 },
-                status=status.HTTP_201_CREATED,
+                status=201,
             )
-        return Response(
+        return CustomResponse.error(
             data={
                 "status": "error",
                 "message": "Invalid data",
                 "errors": serializer.errors,
             },
-            status=status.HTTP_400_BAD_REQUEST,
+            status=400,
         )
 
 
@@ -70,14 +70,14 @@ class GameDetail(APIView):
         try:
             game = Game.objects.get(id=id)
             serializer = GameSerializer(game)
-            return Response(
+            return CustomResponse.success(
                 data={"status": "success", "data": serializer.data},
-                status=status.HTTP_200_OK,
+                status=200,
             )
         except Game.DoesNotExist:
-            return Response(
+            return CustomResponse.error(
                 data={"status": "error", "message": "Game not found"},
-                status=status.HTTP_404_NOT_FOUND,
+                status=404,
             )
 
 
@@ -94,22 +94,22 @@ class UpdateGame(APIView):
             serializer = GameSerializer(game, data=request.data)
             if serializer.is_valid():
                 serializer.save()
-                return Response(
+                return CustomResponse.success(
                     data={"status": "success", "message": "Game updated successfully"},
-                    status=status.HTTP_200_OK,
+                    status=200,
                 )
-            return Response(
+            return CustomResponse.error(
                 data={
                     "status": "error",
                     "message": "Invalid data",
                     "errors": serializer.errors,
                 },
-                status=status.HTTP_400_BAD_REQUEST,
+                status=400,
             )
         except Game.DoesNotExist:
-            return Response(
+            return CustomResponse.error(
                 data={"status": "error", "message": "Game not found"},
-                status=status.HTTP_404_NOT_FOUND,
+                status=404,
             )
 
 
@@ -124,14 +124,14 @@ class DeleteGame(APIView):
         try:
             game = Game.objects.get(id=id)
             game.delete()
-            return Response(
+            return CustomResponse.success(
                 data={"status": "success", "message": "Game deleted successfully"},
-                status=status.HTTP_200_OK,
+                status=200,
             )
         except Game.DoesNotExist:
-            return Response(
+            return CustomResponse.error(
                 data={"status": "error", "message": "Game not found"},
-                status=status.HTTP_404_NOT_FOUND,
+                status=404,
             )
 
 
@@ -145,9 +145,9 @@ class PlayerList(APIView):
     def get(self, request):
         players = Player.objects.all()
         serializer = PlayerSerializer(players, many=True)
-        return Response(
+        return CustomResponse.success(
             data={"status": "success", "data": serializer.data},
-            status=status.HTTP_200_OK,
+            status=200,
         )
 
 
@@ -162,21 +162,21 @@ class CreatePlayer(APIView):
         serializer = PlayerSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(
+            return CustomResponse.success(
                 data={
                     "status": "success",
                     "message": "Player created successfully",
                     "data": serializer.data,
                 },
-                status=status.HTTP_201_CREATED,
+                status=201,
             )
-        return Response(
+        return CustomResponse.error(
             data={
                 "status": "error",
                 "message": "Invalid data",
                 "errors": serializer.errors,
             },
-            status=status.HTTP_400_BAD_REQUEST,
+            status=400,
         )
 
 
@@ -191,14 +191,14 @@ class PlayerDetail(APIView):
         try:
             player = Player.objects.get(id=id)
             serializer = PlayerSerializer(player)
-            return Response(
+            return CustomResponse.success(
                 data={"status": "success", "data": serializer.data},
-                status=status.HTTP_200_OK,
+                status=200,
             )
         except Player.DoesNotExist:
-            return Response(
+            return CustomResponse.error(
                 data={"status": "error", "message": "Player not found"},
-                status=status.HTTP_404_NOT_FOUND,
+                status=404,
             )
 
     @extend_schema(
@@ -209,27 +209,27 @@ class PlayerDetail(APIView):
         try:
             player = Player.objects.get(id=id)
             serializer = PlayerSerializer(player, data=request.data)
-            if serializer.is_valid():
+            if serializer.is_valid(raise_exception=True):
                 serializer.save()
-                return Response(
+                return CustomResponse.success(
                     data={
                         "status": "success",
                         "message": "Player updated successfully",
                     },
-                    status=status.HTTP_200_OK,
+                    status=200,
                 )
-            return Response(
+            return CustomResponse.error(
                 data={
                     "status": "error",
                     "message": "Invalid data",
                     "errors": serializer.errors,
                 },
-                status=status.HTTP_400_BAD_REQUEST,
+                status=400,
             )
         except Player.DoesNotExist:
-            return Response(
+            return CustomResponse.error(
                 data={"status": "error", "message": "Player not found"},
-                status=status.HTTP_404_NOT_FOUND,
+                status=404,
             )
 
     @extend_schema(
@@ -240,14 +240,14 @@ class PlayerDetail(APIView):
         try:
             player = Player.objects.get(id=id)
             player.delete()
-            return Response(
+            return CustomResponse.success(
                 data={"status": "success", "message": "Player deleted successfully"},
-                status=status.HTTP_200_OK,
+                status=200,
             )
         except Player.DoesNotExist:
-            return Response(
+            return CustomResponse.error(
                 data={"status": "error", "message": "Player not found"},
-                status=status.HTTP_404_NOT_FOUND,
+                status=404,
             )
 
 
@@ -264,25 +264,25 @@ class UpdatePlayer(APIView):
             serializer = PlayerSerializer(player, data=request.data)
             if serializer.is_valid():
                 serializer.save()
-                return Response(
+                return CustomResponse.success(
                     data={
                         "status": "success",
                         "message": "Player updated successfully",
                     },
-                    status=status.HTTP_200_OK,
+                    status=200,
                 )
-            return Response(
+            return CustomResponse.error(
                 data={
                     "status": "error",
                     "message": "Invalid data",
                     "errors": serializer.errors,
                 },
-                status=status.HTTP_400_BAD_REQUEST,
+                status=400,
             )
         except Player.DoesNotExist:
-            return Response(
+            return CustomResponse.error(
                 data={"status": "error", "message": "Player not found"},
-                status=status.HTTP_404_NOT_FOUND,
+                status=404,
             )
 
 
@@ -297,12 +297,12 @@ class DeletePlayer(APIView):
         try:
             player = Player.objects.get(id=id)
             player.delete()
-            return Response(
+            return CustomResponse.success(
                 data={"status": "success", "message": "Player deleted successfully"},
-                status=status.HTTP_200_OK,
+                status=200,
             )
         except Player.DoesNotExist:
-            return Response(
+            return CustomResponse.error(
                 data={"status": "error", "message": "Player not found"},
-                status=status.HTTP_404_NOT_FOUND,
+                status=404,
             )

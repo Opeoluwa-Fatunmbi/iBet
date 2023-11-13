@@ -40,7 +40,7 @@ class WalletView(APIView):
             return CustomResponse.success(
                 data=serializer.data,
                 message=_("Wallet balance"),
-                status=status.HTTP_200_OK,
+                status=200,
             )
         except Exception as e:
             return CustomResponse.error(
@@ -71,7 +71,7 @@ class TransactionView(APIView):
             return CustomResponse.success(
                 data=serializer.data,
                 message=_("User transactions"),
-                status=status.HTTP_200_OK,
+                status=200,
             )
         except Exception as e:
             return CustomResponse.error(
@@ -117,7 +117,7 @@ class TransactionView(APIView):
                 return CustomResponse.success(
                     data=TransactionSerializer(transaction).data,
                     message=_("Transaction created successfully"),
-                    status=status.HTTP_201_CREATED,
+                    status=201,
                 )
         except Exception as e:
             return CustomResponse.error(
@@ -150,7 +150,7 @@ class InvoiceView(APIView):
             return CustomResponse.success(
                 data=serializer.data,
                 message=_("User invoices"),
-                status=status.HTTP_200_OK,
+                status=200,
             )
         except Exception as e:
             return CustomResponse.error(

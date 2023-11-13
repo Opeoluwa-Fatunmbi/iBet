@@ -11,9 +11,6 @@ class Match(BaseModel):
         IN_PROGRESS = "IN_PROGRESS", _("In Progress")
         COMPLETED = "COMPLETED", _("Completed")
 
-    match_date = models.DateTimeField(
-        _("Match Date"), auto_now=False, auto_now_add=False
-    )
     status = models.CharField(
         _("Status"),
         max_length=20,

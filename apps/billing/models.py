@@ -10,6 +10,8 @@ class Transaction(BaseModel):
     class TRANSACTION_STATUS_CHOICES(models.TextChoices):
         DEPOSIT = "DEPOSIT", _("Deposit")
         WITHDRAWAL = "WITHDRAWAL", _("Withdrawal")
+        REFUND = "REFUND", _("Refund")
+        PENDING = "PENDING", _("Pending")
 
     class PAYMENT_METHOD_CHOICES(models.TextChoices):
         PAYPAL = "PAYPAL", _("PayPal")
@@ -19,7 +21,7 @@ class Transaction(BaseModel):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="transactions"
     )
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    amount = models.PositiveIntegerField(default=0)
     transaction_type = models.CharField(
         max_length=20,
         choices=TRANSACTION_STATUS_CHOICES.choices,
@@ -31,7 +33,6 @@ class Transaction(BaseModel):
         choices=PAYMENT_METHOD_CHOICES.choices,
         default=PAYMENT_METHOD_CHOICES.BANK_TRANSFER,
     )
-    invoice_number = models.CharField(max_length=50, blank=True, null=True)
     is_successful = models.BooleanField(default=True)
 
     def __str__(self):

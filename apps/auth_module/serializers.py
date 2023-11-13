@@ -93,3 +93,11 @@ class VerifyOtpSerializer(serializers.Serializer):
 
 class ResendOtpSerializer(serializers.Serializer):
     email = serializers.EmailField()
+
+
+class FacebookLoginSerializer(serializers.Serializer):
+    access_token = serializers.CharField()
+
+
+class GoogleLoginSerializer(serializers.Serializer):
+    access_token = serializers.CharField()

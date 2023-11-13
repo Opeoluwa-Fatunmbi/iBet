@@ -83,10 +83,10 @@ class Util:
         EmailThread(email_message).start()
 
     @staticmethod
-    def match_created(user):
+    def match(user):
         subject = "Match Created!"
         message = render_to_string(
-            "match_created.html",
+            "match.html",
             {
                 "name": user.full_name,
             },

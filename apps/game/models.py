@@ -19,7 +19,6 @@ class Game(BaseModel):
         ANAGRAMS = "ANAGRAMS", "Anagrams"
         WORDBITES = "WORDBITES", "Wordbites"
 
-    name = models.CharField(max_length=100)
     description = models.TextField(max_length=500)
     rules = models.TextField(_("Rules"), max_length=500)
     game = models.CharField(

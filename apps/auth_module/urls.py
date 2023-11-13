@@ -8,6 +8,8 @@ from apps.auth_module.views import (
     SendPasswordResetOtpView,
     SetNewPasswordView,
     RefreshTokensView,
+    FacebookLoginView,
+    GoogleLoginView,
 )
 
 app_name = "apps.auth_module"
@@ -29,4 +31,6 @@ urlpatterns = [
     path("login/", LoginView.as_view(), name="login"),
     path("refresh/", RefreshTokensView.as_view(), name="refresh-tokens"),
     path("logout/", LogoutView.as_view(), name="logout"),
+    path("facebook/", FacebookLoginView.as_view(), name="facebook-login"),
+    path("google/", GoogleLoginView.as_view(), name="google-login"),
 ]

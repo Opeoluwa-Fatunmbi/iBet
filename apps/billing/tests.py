@@ -30,7 +30,7 @@ class TestBilling(APITestCase):
         url = reverse("billing:wallet")
         self.client.force_authenticate(user=self.user)
         response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["balance"], 1000)
 
     def test_get_transaction(self):
@@ -40,7 +40,7 @@ class TestBilling(APITestCase):
         url = reverse("billing:transaction")
         self.client.force_authenticate(user=self.user)
         response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
 
     def test_post_transaction(self):
@@ -51,7 +51,7 @@ class TestBilling(APITestCase):
         self.client.force_authenticate(user=self.user)
         data = {"amount": 100, "type": "deposit"}
         response = self.client.post(url, data)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data["amount"], 100)
         self.assertEqual(response.data["type"], "deposit")
         self.assertEqual(response.data["wallet"], self.wallet.id)
@@ -65,7 +65,7 @@ class TestBilling(APITestCase):
         self.client.force_authenticate(user=self.user)
         data = {"amount": 100, "type": "withdraw"}
         response = self.client.post(url, data)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data["amount"], 100)
         self.assertEqual(response.data["type"], "withdraw")
         self.assertEqual(response.data["wallet"], self.wallet.id)

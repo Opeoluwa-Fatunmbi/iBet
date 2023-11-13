@@ -1,12 +1,12 @@
 from django.contrib import admin
-from .models import Match, Bet, Outcome
+from apps.betting.models import Match, Bet, Outcome
 
 
 class MatchAdmin(admin.ModelAdmin):
-    list_display = ("match_date", "status", "player_1", "player_2", "duration_minutes")
+    list_display = ("status", "player_1", "player_2", "duration_minutes")
     list_filter = ("status",)
     search_fields = ("player_1__username", "player_2__username", "notes")
-    date_hierarchy = "match_date"
+    date_hierarchy = "created_at"
 
 
 class BetAdmin(admin.ModelAdmin):

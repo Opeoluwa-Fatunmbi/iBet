@@ -1,4 +1,5 @@
 import uuid
+from django.conf import settings
 from django.core.mail import send_mail
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError, transaction
@@ -26,11 +27,15 @@ from apps.auth_module.serializers import (
     ResendOtpSerializer,
     RefreshSerializer,
     SetNewPasswordSerializer,
+    FacebookLoginSerializer,
+    GoogleLoginSerializer,
 )
 from .emails import Util
 from rest_framework.exceptions import ValidationError
 from apps.auth_module.auth import Authentication
 from rest_framework.exceptions import NotFound, AuthenticationFailed
+import facebook
+import requests
 
 
 class RegisterView(APIView):
@@ -328,3 +333,220 @@ class RefreshTokensView(APIView):
         response_data = {"access": access, "refresh": refresh}
 
         return CustomResponse.success(response_data, status=200)
+
+
+class GoogleLoginView(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = GoogleLoginSerializer
+    throttle_classes = [UserRateThrottle]
+
+    @extend_schema(
+        summary="Google Login",
+        description="Authenticate and log in a user using Google.",
+    )
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        id_token = serializer.validated_data["id_token"]
+
+        try:
+            # Validate the id_token
+            idinfo = id_token.verify_oauth2_token(
+                id_token, requests.Request(), settings.GOOGLE_CLIENT_ID
+            )
+
+            # If multiple clients access the backend server:
+            # if idinfo["aud"] not in [CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]:
+            #     raise ValueError("Could not verify audience.")
+
+            # Get the user's Google Account ID from the decoded token
+            google_id = idinfo["sub"]
+
+            # Check if the user already exists in the database
+            user = User.objects.filter(google_id=google_id).first()
+
+            if user:
+                # If the user exists, log them in
+                login(request, user)
+
+                # Access the user's JWT token from the request (if it exists)
+                token = request.auth
+
+                if token:
+                    # Blacklist the token using Authentication class
+                    Authentication.blacklist_token(token)
+
+                # Generate a new JWT access token
+                access = Authentication.create_access_token({"user_id": str(user.id)})
+
+                # Generate a new JWT refresh token
+                refresh = Authentication.create_refresh_token()
+
+                # Save the new JWT tokens to the database
+                Jwt.objects.create(user_id=user.id, access=access, refresh=refresh)
+
+                # Return a response containing the new JWT tokens
+                return CustomResponse.success(
+                    data={"access": access, "refresh": refresh},
+                    status=200,
+                )
+
+            # If the user does not exist, create a new user
+            else:
+                # Get the user's email from the decoded token
+                email = idinfo["email"]
+
+                # Check if the email is already registered
+                existing_user = User.objects.filter(email=email).first()
+
+                if existing_user:
+                    return CustomResponse.error(
+                        {"error": "Email already registered"},
+                        status=409,
+                    )
+
+                # Create a new user
+                user = User.objects.create(
+                    email=email,
+                    google_id=google_id,
+                    is_email_verified=True,
+                )
+
+                # Log the user in
+                login(request, user)
+
+                # Generate a new JWT access token
+                access = Authentication.create_access_token({"user_id": str(user.id)})
+
+                # Generate a new JWT refresh token
+                refresh = Authentication.create_refresh_token()
+
+                # Save the new JWT tokens to the database
+                Jwt.objects.create(user_id=user.id, access=access, refresh=refresh)
+
+                # Return a response containing the new JWT tokens
+                return CustomResponse.success(
+                    data={"access": access, "refresh": refresh},
+                    status=201,
+                )
+
+        except ValueError:
+            # Invalid token
+            return CustomResponse.error(
+                {"error": "Invalid token"},
+                status=400,
+            )
+
+        except Exception as e:
+            # Handle other exceptions
+            return CustomResponse.error(
+                {"error": str(e)},
+                status=500,
+            )
+
+
+class FacebookLoginView(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = FacebookLoginSerializer
+    throttle_classes = [UserRateThrottle]
+
+    @extend_schema(
+        summary="Facebook Login",
+        description="Authenticate and log in a user using Facebook.",
+    )
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        access_token = serializer.validated_data["access_token"]
+
+        try:
+            # Validate the access token
+            graph = facebook.GraphAPI(access_token=access_token)
+            profile = graph.get_object(id="me", fields="id,email")
+
+            # Get the user's Facebook ID from the decoded token
+            facebook_id = profile["id"]
+
+            # Check if the user already exists in the database
+            user = User.objects.filter(facebook_id=facebook_id).first()
+
+            if user:
+                # If the user exists, log them in
+                login(request, user)
+
+                # Access the user's JWT token from the request (if it exists)
+                token = request.auth
+
+                if token:
+                    # Blacklist the token using Authentication class
+                    Authentication.blacklist_token(token)
+
+                # Generate a new JWT access token
+                access = Authentication.create_access_token({"user_id": str(user.id)})
+
+                # Generate a new JWT refresh token
+                refresh = Authentication.create_refresh_token()
+
+                # Save the new JWT tokens to the database
+                Jwt.objects.create(user_id=user.id, access=access, refresh=refresh)
+
+                # Return a response containing the new JWT tokens
+                return CustomResponse.success(
+                    data={"access": access, "refresh": refresh},
+                    status=200,
+                )
+
+            # If the user does not exist, create a new user
+            else:
+                # Get the user's email from the decoded token
+                email = profile["email"]
+
+                # Check if the email is already registered
+                existing_user = User.objects.filter(email=email).first()
+
+                if existing_user:
+                    return CustomResponse.error(
+                        {"error": "Email already registered"},
+                        status=409,
+                    )
+
+                # Create a new user
+                user = User.objects.create(
+                    email=email,
+                    facebook_id=facebook_id,
+                    is_email_verified=True,
+                )
+
+                # Log the user in
+                login(request, user)
+
+                # Generate a new JWT access token
+                access = Authentication.create_access_token({"user_id": str(user.id)})
+
+                # Generate a new JWT refresh token
+                refresh = Authentication.create_refresh_token()
+
+                # Save the new JWT tokens to the database
+                Jwt.objects.create(user_id=user.id, access=access, refresh=refresh)
+
+                # Return a response containing the new JWT tokens
+                return CustomResponse.success(
+                    data={"access": access, "refresh": refresh},
+                    status=201,
+                )
+
+        except facebook.GraphAPIError:
+            # Invalid token
+            return CustomResponse.error(
+                {"error": "Invalid token"},
+                status=400,
+            )
+
+        except Exception as e:
+            # Handle other exceptions
+            return CustomResponse.error(
+                {"error": str(e)},
+                status=500,
+            )
