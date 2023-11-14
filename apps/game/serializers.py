@@ -34,21 +34,27 @@ class GameSerializer(serializers.Serializer):
 
 
 class PlayerSerializer(serializers.Serializer):
-    user = UserSerializer()
-    score = serializers.IntegerField(default=0)
-    experience_level = serializers.CharField(
-        max_length=50, allow_blank=True, allow_null=True
+    user = UserSerializer(many=False, read_only=True)
+    experience_level = serializers.ChoiceField(
+        choices=Player.ExperienceLevel.choices, default=Player.ExperienceLevel.BEGINNER
     )
 
     def create(self, validated_data):
-        user_data = validated_data.pop("user")
-        user = User.objects.create(**user_data)
-        return Player.objects.create(user=user, **validated_data)
+        return Player.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
-        instance.score = validated_data.get("score", instance.score)
         instance.experience_level = validated_data.get(
             "experience_level", instance.experience_level
         )
         instance.save()
         return instance
+
+    def to_representation(self, instance):
+        self.fields["user"] = UserSerializer(read_only=True)
+        return super(PlayerSerializer, self).to_representation(instance)
+
+    def to_internal_value(self, data):
+        self.fields["user"] = serializers.PrimaryKeyRelatedField(
+            queryset=User.objects.all()
+        )
+        return super(PlayerSerializer, self).to_internal_value(data)

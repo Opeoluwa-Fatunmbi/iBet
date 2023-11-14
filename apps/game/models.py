@@ -38,12 +38,21 @@ class Game(BaseModel):
 
 
 class Player(BaseModel):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    score = models.PositiveIntegerField(default=0)
-    experience_level = models.CharField(max_length=50, blank=True, null=True)
+    class ExperienceLevel(models.TextChoices):
+        BEGINNER = "BEGINNER", _("Beginner")
+        INTERMEDIATE = "INTERMEDIATE", _("Intermediate")
+        MASTER = "MASTER", _("Master")
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="player")
+    experience_level = models.CharField(
+        _("Experience Level"),
+        max_length=50,
+        choices=ExperienceLevel.choices,
+        default=ExperienceLevel.BEGINNER,
+    )
 
     def __str__(self):
-        return self.user
+        return f"{self.user.full_name}"
 
     class Meta:
         verbose_name = "Player"
