@@ -36,7 +36,7 @@ class Transaction(BaseModel):
     is_successful = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.user.email} - {self.transaction_type} - {self.amount}"
+        return f"{self.user.full_name} - {self.transaction_type} - {self.amount}"
 
     class Meta:
         verbose_name = "Transaction"

@@ -19,14 +19,14 @@ class Game(BaseModel):
         ANAGRAMS = "ANAGRAMS", "Anagrams"
         WORDBITES = "WORDBITES", "Wordbites"
 
-    description = models.TextField(max_length=500)
-    rules = models.TextField(_("Rules"), max_length=500)
-    game = models.CharField(
+    name = models.CharField(
         _("Game"), max_length=50, choices=Games.choices, default=Games.EIGHTBALL
     )
+    description = models.TextField(max_length=500)
+    rules = models.TextField(_("Rules"), max_length=500)
     goal = models.TextField(_("Goal"), max_length=200)
     min_players = models.PositiveIntegerField(default=2)
-    max_players = models.PositiveIntegerField(default=2)
+    max_players = models.PositiveIntegerField(default=3)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):

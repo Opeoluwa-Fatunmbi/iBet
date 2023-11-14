@@ -1,21 +1,18 @@
 from django.contrib import admin
-from apps.game.models import Game, Player
-
-# Register your models here.
+from .models import Game, Player
 
 
 class GameAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "game", "min_players", "max_players", "is_active")
-    list_filter = ("game", "is_active")
-    search_fields = ("name",)
-    ordering = ("id",)
+    list_display = ("name", "min_players", "max_players", "is_active")
+    list_filter = list_display
+    search_fields = ["name"]
 
 
 class PlayerAdmin(admin.ModelAdmin):
-    list_display = ("id", "user", "score", "experience_level")
-    search_fields = ("user__username", "user__email")
-    ordering = ("id",)
+    list_display = ("user", "score", "experience_level")
+    list_filter = list_display
+    search_fields = ["user__username"]
 
 
-admin.register(Game, GameAdmin)
-admin.register(Player, PlayerAdmin)
+admin.site.register(Game)
+admin.site.register(Player)

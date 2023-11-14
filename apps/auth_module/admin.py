@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User
+from apps.auth_module.models import User, Jwt, Otp
 from django.utils.translation import gettext_lazy as _
 
 
@@ -30,4 +30,19 @@ class UserAdmin(admin.ModelAdmin):
     readonly_fields = ("created_at", "updated_at")
 
 
+class JwtAdmin(admin.ModelAdmin):
+    list_display = ("user", "blacklisted", "created_at")
+    list_filter = list_display
+    search_fields = ["user__email", "user__first_name", "user__last_name"]
+    list_filter = ["blacklisted"]
+
+
+class OtpAdmin(admin.ModelAdmin):
+    list_display = ("user", "code", "created_at")
+    list_filter = list_display
+    search_fields = ["user__email", "user__first_name", "user__last_name"]
+
+
 admin.site.register(User, UserAdmin)
+admin.site.register(Jwt, JwtAdmin)
+admin.site.register(Otp, OtpAdmin)
