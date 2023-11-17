@@ -1,12 +1,18 @@
 from rest_framework.views import APIView
 from apps.betting.models import Match, Bet, Outcome
-from .serializers import CreateMatchSerializer, BetSerializer, OutcomeSerializer, MatchSerializer
+from .serializers import (
+    CreateMatchSerializer,
+    BetSerializer,
+    OutcomeSerializer,
+    MatchSerializer,
+)
 from apps.core.responses import CustomResponse
 from rest_framework.throttling import UserRateThrottle
 from drf_spectacular.utils import extend_schema
 from django.db import transaction
 from apps.game.models import Player
 from django.db.models import Q
+
 
 # betting/views
 class CreateMatchView(APIView):
@@ -17,19 +23,13 @@ class CreateMatchView(APIView):
         summary="Create a new match",
         description="Create a new match with the player_1, player_2, and mediator.",
     )
-
     def get(self, request):
         matches = Match.objects.all()
         serializer = self.serializer_class(matches, many=True)
         return CustomResponse.success(serializer.data, status=200)
 
 
-
-
-
-
-
-'''
+"""
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         try:
@@ -43,7 +43,9 @@ class CreateMatchView(APIView):
                 return CustomResponse.error(serializer.errors, status=404)
         except Exception as e:
             return CustomResponse.error(str(e), status=404)
-'''
+"""
+
+
 class BetCreateView(APIView):
     serializer_class = BetSerializer
     throttle_classes = [UserRateThrottle]
@@ -69,7 +71,6 @@ class BetDetailView(APIView):
         summary="Create a new match",
         description="Create a new match with the player_1, player_2, and mediator.",
     )
-
     def get(self, request, pk):
         try:
             bet = Bet.objects.get(pk=pk)
@@ -80,14 +81,12 @@ class BetDetailView(APIView):
             return CustomResponse.error("Bet does not exist", status=404)
 
 
-
 class BetListView(APIView):
     serializer_class = BetSerializer
     throttle_classes = [UserRateThrottle]
 
     @extend_schema(
-        summary="Available bets",   
-        description="Get the list of all available bets"
+        summary="Available bets", description="Get the list of all available bets"
     )
     def get(self, request):
         bets = Bet.objects.all()

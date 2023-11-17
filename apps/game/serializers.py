@@ -13,8 +13,6 @@ class GameSerializer(serializers.Serializer):
         choices=Game.Games.choices, default=Game.Games.EIGHTBALL
     )
     goal = serializers.CharField(max_length=200)
-    min_players = serializers.IntegerField(default=2)
-    max_players = serializers.IntegerField(default=2)
     is_active = serializers.BooleanField(default=True)
 
     def create(self, validated_data):
@@ -26,19 +24,17 @@ class GameSerializer(serializers.Serializer):
         instance.rules = validated_data.get("rules", instance.rules)
         instance.game = validated_data.get("game", instance.game)
         instance.goal = validated_data.get("goal", instance.goal)
-        instance.min_players = validated_data.get("min_players", instance.min_players)
-        instance.max_players = validated_data.get("max_players", instance.max_players)
         instance.is_active = validated_data.get("is_active", instance.is_active)
         instance.save()
         return instance
 
 
 class PlayerSerializer(serializers.Serializer):
-    user = UserSerializer(many=False, read_only=True)
-    experience_level = serializers.ChoiceField(
-        choices=Player.ExperienceLevel.choices, default=Player.ExperienceLevel.BEGINNER
+    first_name = serializers.CharField(max_length=100)
+    last_name = serializers.CharField(max_length=100)
+    experience_level = serializers.CharField(
+        max_length=50, default=Player.ExperienceLevel.BEGINNER
     )
-
     def create(self, validated_data):
         return Player.objects.create(**validated_data)
 

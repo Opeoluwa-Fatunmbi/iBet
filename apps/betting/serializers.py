@@ -2,7 +2,6 @@ from rest_framework import serializers
 from apps.betting.models import Match, Bet, Outcome
 
 
-
 class CreateMatchSerializer(serializers.Serializer):
     player_1 = serializers.CharField(max_length=100)
     player_2 = serializers.CharField(max_length=100)
@@ -29,9 +28,6 @@ class BetSerializer(serializers.Serializer):
 class OutcomeSerializer(serializers.Serializer):
     winner = serializers.CharField(max_length=100)
     loser = serializers.CharField(max_length=100)
-    
 
     def create(self, validated_data):
         return Outcome.objects.create(**validated_data)
-
-

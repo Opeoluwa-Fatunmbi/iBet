@@ -26,8 +26,6 @@ class Game(BaseModel):
     description = models.TextField(max_length=500)
     rules = models.TextField(_("Rules"), max_length=500)
     goal = models.TextField(_("Goal"), max_length=200)
-    min_players = models.PositiveIntegerField(default=2)
-    max_players = models.PositiveIntegerField(default=3)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
@@ -45,6 +43,8 @@ class Player(BaseModel):
         MASTER = "MASTER", _("Master")
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="player")
+    first_name = models.CharField(_("First Name"), max_length=100, default="")
+    last_name = models.CharField(_("Last Name"), max_length=100, default="")
     experience_level = models.CharField(
         _("Experience Level"),
         max_length=50,

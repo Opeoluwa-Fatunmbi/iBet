@@ -3,8 +3,8 @@ from apps.game.models import Game, Player
 
 
 class GameAdmin(admin.ModelAdmin):
-    list_display = ("name", "min_players", "max_players")
-    list_filter = list_display
+    list_display = ("name",)
+    list_filter = ("name",)
     search_fields = ["name"]
 
 

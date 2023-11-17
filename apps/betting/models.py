@@ -53,7 +53,9 @@ class Bet(BaseModel):
         Player, on_delete=models.CASCADE, related_name="player_bet", default=1
     )
     amount = models.DecimalField(_("Amount"), max_digits=10, decimal_places=2)
-    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="game_bet")
+    game = models.ForeignKey(
+        Game, on_delete=models.CASCADE, related_name="game_bet", default=1
+    )
 
     def __str__(self):
         return f"{self.match} - {self.amount}"
@@ -73,7 +75,7 @@ class Outcome(BaseModel):
     loser = models.ForeignKey(
         Player, on_delete=models.CASCADE, related_name="losing_outcomes", default=None
     )
-    winning_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
         return f"{self.match} - Winner: {self.winner}"

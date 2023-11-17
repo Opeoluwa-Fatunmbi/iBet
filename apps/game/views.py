@@ -8,7 +8,7 @@ from apps.core.responses import CustomResponse
 
 
 class GameList(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     serializer_class = GameSerializer
 
     @extend_schema(
@@ -20,18 +20,21 @@ class GameList(APIView):
             games = Game.objects.all()
             serializer = GameSerializer(games, many=True)
             return CustomResponse.success(
-                data={"status": "success", "data": serializer.data},
-                status=200,
+                message="Request successful",
+                data=serializer.data,
+                status_code=200,
             )
+
         except Exception as e:
             return CustomResponse.error(
-                data={"status": "error", "error": str(e)},
-                status=500,
+                message="An error occurred",
+                data=str(e),
+                status_code=500,
             )
 
 
 class CreateGame(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    # permission_classes = [IsAuthenticated, IsAdminUser]
 
     @extend_schema(
         summary="Create a new game",
@@ -136,23 +139,31 @@ class DeleteGame(APIView):
 
 
 class PlayerList(APIView):
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
 
     @extend_schema(
         summary="Get a list of players",
         description="Retrieve a list of all players.",
     )
     def get(self, request):
-        players = Player.objects.all()
-        serializer = PlayerSerializer(players, many=True)
-        return CustomResponse.success(
-            data={"status": "success", "data": serializer.data},
-            status=200,
-        )
+        try:
+            players = Player.objects.all()
+            serializer = PlayerSerializer(players, many=True)
+            return CustomResponse.success(
+                    message="Request successful",
+                    data=serializer.data,
+                    status_code=200,
+            )
+        except Exception as e:
+            return CustomResponse.error(
+                    message="An error occurred",
+                    data=str(e),
+                    status_code=500,
+            )
 
 
 class CreatePlayer(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     @extend_schema(
         summary="Create a new player",

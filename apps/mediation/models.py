@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
 from apps.auth_module.models import User
 from apps.core.models import BaseModel
 

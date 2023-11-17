@@ -15,7 +15,7 @@ class BetAdmin(admin.ModelAdmin):
 
 
 class OutcomeAdmin(admin.ModelAdmin):
-    list_display = ("match", "winner", "loser", "winning_amount")
+    list_display = ("match", "winner", "loser", "amount")
     search_fields = (
         "match__player_1__username",
         "match__player_2__username",

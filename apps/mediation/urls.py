@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import MediatorListCreateView, MediationListCreateView
+from apps.mediation.views import MediatorListCreateView, MediationListCreateView
 
 app_name = "apps.mediation"
 
