@@ -13,7 +13,7 @@ class MediatorSerializer(serializers.Serializer):
         instance.is_engaged = validated_data.get("is_engaged", instance.is_engaged)
         instance.save()
         return instance
-    
+
     def to_representation(self, instance):
         self.fields["user"] = UserSerializer(read_only=True)
         return super(MediatorSerializer, self).to_representation(instance)

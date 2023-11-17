@@ -35,6 +35,7 @@ class PlayerSerializer(serializers.Serializer):
     experience_level = serializers.CharField(
         max_length=50, default=Player.ExperienceLevel.BEGINNER
     )
+
     def create(self, validated_data):
         return Player.objects.create(**validated_data)
 

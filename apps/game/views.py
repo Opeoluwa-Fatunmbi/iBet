@@ -139,7 +139,7 @@ class DeleteGame(APIView):
 
 
 class PlayerList(APIView):
-    #permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     @extend_schema(
         summary="Get a list of players",
@@ -150,15 +150,15 @@ class PlayerList(APIView):
             players = Player.objects.all()
             serializer = PlayerSerializer(players, many=True)
             return CustomResponse.success(
-                    message="Request successful",
-                    data=serializer.data,
-                    status_code=200,
+                message="Request successful",
+                data=serializer.data,
+                status_code=200,
             )
         except Exception as e:
             return CustomResponse.error(
-                    message="An error occurred",
-                    data=str(e),
-                    status_code=500,
+                message="An error occurred",
+                data=str(e),
+                status_code=500,
             )
 
 
