@@ -20,10 +20,8 @@ class MatchSerializer(serializers.Serializer):
         return Match.objects.create(**validated_data)
 
 
-class BetSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Bet
-        fields = "__all__"
+class BetSerializer(serializers.Serializer):
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2)
 
 
 class OutcomeSerializer(serializers.ModelSerializer):

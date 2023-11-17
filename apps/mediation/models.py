@@ -8,7 +8,6 @@ from apps.core.models import BaseModel
 # Mediation models
 class Mediator(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    fees = models.DecimalField(_("Fees"), max_digits=10, decimal_places=2, default=0.00)
 
     def __str__(self):
         return str(self.user)  # or return self.user.username

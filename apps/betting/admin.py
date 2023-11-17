@@ -10,9 +10,8 @@ class MatchAdmin(admin.ModelAdmin):
 
 
 class BetAdmin(admin.ModelAdmin):
-    list_display = ("match", "amount", "is_winner")
-    list_filter = ("is_winner",)
-    search_fields = ("match__player_1__username", "match__player_2__username")
+    list_display = ("amount",)
+    list_filter = list_display
 
 
 class OutcomeAdmin(admin.ModelAdmin):

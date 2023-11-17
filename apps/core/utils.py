@@ -4,9 +4,11 @@ from apps.auth_module.auth import Authentication
 from apps.auth_module.models import User, Jwt
 from apps.core.models import File, GuestUser
 from apps.core.exceptions import RequestError
-
+from apps.betting.models import Bet
+from apps.game.models import Player
 from datetime import timedelta
 from uuid import UUID
+from django.db import transaction
 
 
 class IsAuthenticatedCustom(BasePermission):
@@ -61,6 +63,31 @@ def is_int(value):
         return int(value)
     except:
         raise RequestError(err_msg="Invalid Quantity params", status_code=422)
+
+
+def match_players():
+    # Get players with their total stakes
+    players_with_stakes = Player.objects.filter("game__stake")
+
+    # Iterate through players and try to find a match
+    for player in players_with_stakes:
+        # Find a player with the same stake (excluding the current player)
+        match = (
+            Player.objects.exclude(id=player.id)
+            .filter(game__stake=player.total_stake)
+            .first()
+        )
+
+        if match:
+            # Players found with the same stake, perform matching logic
+            with transaction.atomic():
+                # Perform any matching logic here
+                # For example, you can create a new Match model or update existing ones
+                # Remember to handle edge cases and ensure that the logic is atomic (using transaction.atomic)
+
+                print(
+                    f"Matched {player} with {match} based on stake {player.total_stake}"
+                )
 
 
 # Test Utils

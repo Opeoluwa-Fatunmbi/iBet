@@ -18,14 +18,6 @@ class CreateMatchView(APIView):
         serializer = self.serializer_class(data=request.data)
         try:
             if serializer.is_valid(raise_exception=True):
-                player_1 = serializer.validated_data.get("player_1")
-                player_2 = serializer.validated_data.get("player_2")
-                mediator = serializer.validated_data.get("mediator")
-
-                Match.objects.create(
-                    player_1=player_1, player_2=player_2, mediator=mediator
-                )
-
                 serializer.save()
                 return CustomResponse.success(serializer.data, status=201)
 
@@ -35,11 +27,34 @@ class CreateMatchView(APIView):
             return CustomResponse.error(str(e), status=400)
 
 
-class BetListCreateView(APIView):
-    queryset = Bet.objects.all()
+class BetCreateView(APIView):
     serializer_class = BetSerializer
+    throttle_classes = [UserRateThrottle]
+
+    @extend_schema(
+        summary="Create a new match",
+        description="Create a new match with the player_1, player_2, and mediator.",
+    )
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return CustomResponse.success(serializer.data, status=201)
+
+        return CustomResponse.error(serializer.errors, status=404)
 
 
-class OutcomeListCreateView(APIView):
-    queryset = Outcome.objects.all()
-    serializer_class = OutcomeSerializer
+class BetDetailView(APIView):
+    pass
+
+
+class BetListView(APIView):
+    pass
+
+
+class ConfirmOutcomeView(APIView):
+    pass
+
+
+class OutcomeView(APIView):
+    pass

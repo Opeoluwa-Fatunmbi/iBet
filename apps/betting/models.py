@@ -3,6 +3,7 @@ from apps.auth_module.models import User
 from apps.core.models import BaseModel
 from django.utils.translation import gettext_lazy as _
 from apps.mediation.models import Mediator
+from apps.game.models import Player
 
 
 class Match(BaseModel):
@@ -47,9 +48,10 @@ class Match(BaseModel):
 
 
 class Bet(BaseModel):
-    match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name="bets")
+    player = models.ForeignKey(
+        Player, on_delete=models.CASCADE, related_name="player_bet", default=1
+    )
     amount = models.DecimalField(_("Amount"), max_digits=10, decimal_places=2)
-    is_winner = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.match} - {self.amount}"
@@ -60,12 +62,14 @@ class Bet(BaseModel):
 
 
 class Outcome(BaseModel):
-    match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name="outcomes")
+    match = models.OneToOneField(
+        Match, on_delete=models.CASCADE, related_name="outcomes"
+    )
     winner = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="winning_outcomes"
+        Player, on_delete=models.CASCADE, related_name="winning_outcomes"
     )
     loser = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="losing_outcomes", default=None
+        Player, on_delete=models.CASCADE, related_name="losing_outcomes", default=None
     )
     winning_amount = models.DecimalField(max_digits=10, decimal_places=2)
 
