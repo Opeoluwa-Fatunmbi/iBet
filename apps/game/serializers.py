@@ -1,7 +1,7 @@
 # serializers.py
 from rest_framework import serializers
 from apps.auth_module.models import User
-from .models import Game, Player
+from apps.game.models import Game, Player
 from apps.auth_module.serializers import UserSerializer
 
 

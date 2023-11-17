@@ -4,6 +4,7 @@ from apps.core.models import BaseModel
 from django.utils.translation import gettext_lazy as _
 from apps.mediation.models import Mediator
 from apps.game.models import Player
+from apps.game.models import Game
 
 
 class Match(BaseModel):
@@ -52,6 +53,7 @@ class Bet(BaseModel):
         Player, on_delete=models.CASCADE, related_name="player_bet", default=1
     )
     amount = models.DecimalField(_("Amount"), max_digits=10, decimal_places=2)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="game_bet")
 
     def __str__(self):
         return f"{self.match} - {self.amount}"
