@@ -54,10 +54,7 @@ class Match(BaseModel):
 
 
 class Bet(BaseModel):
-    player_1 = models.ForeignKey(
-        Player, on_delete=models.CASCADE, related_name="player_bet", default=1
-    )
-    player_2 = models.ForeignKey(Player, on_delete=models.CASCADE, default=1)
+    player = models.ForeignKey(Player, on_delete=models.CASCADE, default=1)
     amount = models.DecimalField(_("Amount"), max_digits=10, decimal_places=2)
     game = models.ForeignKey(
         Game, on_delete=models.CASCADE, related_name="game_bet", default=1

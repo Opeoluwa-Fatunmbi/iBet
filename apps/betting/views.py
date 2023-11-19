@@ -16,58 +16,7 @@ from apps.mediation.models import Mediator
 from apps.billing.serializers import WalletSerializer
 
 
-# betting/views
-
-"""
-class BetCreateView(APIView):
-    serializer_class = BetSerializer
-    throttle_classes = [UserRateThrottle]
-
-    @extend_schema(
-        summary="Create a new match",
-        description="Create a new match with the player_1, player_2, and mediator.",
-    )
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return CustomResponse.success(serializer.data, status=201)
-
-        return CustomResponse.error(serializer.errors, status=404)
-
-
-class BetDetailView(APIView):
-    serializer_class = BetSerializer
-    throttle_classes = [UserRateThrottle]
-
-    @extend_schema(
-        summary="Create a new match",
-        description="Create a new match with the player_1, player_2, and mediator.",
-    )
-    def get(self, request, pk):
-        try:
-            bet = Bet.objects.get(pk=pk)
-            serializer = self.serializer_class(bet)
-            return CustomResponse.success(serializer.data, status=200)
-
-        except Bet.DoesNotExist:
-            return CustomResponse.error("Bet does not exist", status=404)
-
-
-class BetListView(APIView):
-    serializer_class = BetSerializer
-    throttle_classes = [UserRateThrottle]
-
-    @extend_schema(
-        summary="Available bets", description="Get the list of all available bets"
-    )
-    def get(self, request):
-        bets = Bet.objects.all()
-        serializer = self.serializer_class(bets, many=True)
-        return CustomResponse.success(serializer.data, status=200)
-"""
-
-## Should the match and bet views be combined?
+# betting/views.py
 
 
 class BetCreateView(APIView):
