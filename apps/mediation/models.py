@@ -10,7 +10,7 @@ class Mediator(BaseModel):
     is_engaged = models.BooleanField(default=False)
 
     def __str__(self):
-        return str(self.user)  # or return self.user.username
+        return f"{self.user.email}"
 
     class Meta:
         verbose_name = "Mediator"

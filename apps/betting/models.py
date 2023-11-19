@@ -39,6 +39,11 @@ class Match(BaseModel):
     )
     notes = models.TextField(_("Notes"), blank=True)
     mediator = models.OneToOneField(Mediator, on_delete=models.CASCADE, null=True)
+    amount = models.DecimalField(
+        _("Amount"), max_digits=10, decimal_places=2, default=0
+    )
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True)
+    is_occupied = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.player_1} vs {self.player_2}"
@@ -49,9 +54,10 @@ class Match(BaseModel):
 
 
 class Bet(BaseModel):
-    player = models.ForeignKey(
+    player_1 = models.ForeignKey(
         Player, on_delete=models.CASCADE, related_name="player_bet", default=1
     )
+    player_2 = models.ForeignKey(Player, on_delete=models.CASCADE, default=1)
     amount = models.DecimalField(_("Amount"), max_digits=10, decimal_places=2)
     game = models.ForeignKey(
         Game, on_delete=models.CASCADE, related_name="game_bet", default=1
