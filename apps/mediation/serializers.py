@@ -4,13 +4,13 @@ from apps.auth_module.serializers import UserSerializer
 
 
 class MediatorSerializer(serializers.Serializer):
-    is_engaged = serializers.BooleanField(default=False)
+    is_active = serializers.BooleanField(default=False)
 
     def create(self, validated_data):
         return Mediator.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
-        instance.is_engaged = validated_data.get("is_engaged", instance.is_engaged)
+        instance.is_active = validated_data.get("is_active", instance.is_active)
         instance.save()
         return instance
 

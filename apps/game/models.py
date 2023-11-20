@@ -51,7 +51,7 @@ class Player(BaseModel):
         choices=ExperienceLevel.choices,
         default=ExperienceLevel.BEGINNER,
     )
-    is_engaged = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.user.full_name}"

@@ -7,7 +7,7 @@ from apps.core.models import BaseModel
 # Mediation models
 class Mediator(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    is_engaged = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.user.email}"

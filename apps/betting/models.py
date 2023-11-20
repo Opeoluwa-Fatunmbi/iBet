@@ -43,7 +43,7 @@ class Match(BaseModel):
         _("Amount"), max_digits=10, decimal_places=2, default=0
     )
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True)
-    is_occupied = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.player_1} vs {self.player_2}"
@@ -59,9 +59,10 @@ class Bet(BaseModel):
     game = models.ForeignKey(
         Game, on_delete=models.CASCADE, related_name="game_bet", default=1
     )
+    is_active = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.match} - {self.amount}"
+        return f"{self.player} - {self.amount}"
 
     class Meta:
         verbose_name = "Bet"

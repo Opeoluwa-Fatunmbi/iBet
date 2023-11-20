@@ -38,13 +38,30 @@ class BetSerializer(serializers.Serializer):
         )
         return super(BetSerializer, self).to_internal_value(data)
 
+    def create(self, validated_data):
+        user = self.context["request"].user
+        amount = validated_data["amount"]
+
+        # Deduct amount from the user's wallet
+        user_wallet = user.wallet
+        user_wallet.balance -= amount
+        user_wallet.save()
+
+        # Create the bet
+        bet = Bet.objects.create(player=user.player, **validated_data)
+
+        # Set is_active to True
+        bet.is_active = True
+        bet.save()
+
+        return bet
+
 
 class OutcomeSerializer(serializers.Serializer):
     pass
 
 
-"""
-class CreateMatchSerializer(serializers.Serializer):
+class MatchSerializer(serializers.Serializer):
     player_1 = serializers.CharField(max_length=100)
     player_2 = serializers.CharField(max_length=100)
     mediator = serializers.CharField(max_length=100)
@@ -54,7 +71,17 @@ class CreateMatchSerializer(serializers.Serializer):
     def create(self, validated_data):
         return Match.objects.create(**validated_data)
 
+    def update(self, instance, validated_data):
+        instance.player_1 = validated_data.get("player_1", instance.player_1)
+        instance.player_2 = validated_data.get("player_2", instance.player_2)
+        instance.mediator = validated_data.get("mediator", instance.mediator)
+        instance.amount = validated_data.get("amount", instance.amount)
+        instance.game = validated_data.get("game", instance.game)
+        instance.save()
+        return instance
 
+
+"""
 class FindMatchSerializer(serializers.Serializer):
     player_1 = serializers.CharField(max_length=100)
     player_2 = serializers.CharField(max_length=100)

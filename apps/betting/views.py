@@ -11,74 +11,165 @@ from rest_framework.throttling import UserRateThrottle
 from drf_spectacular.utils import extend_schema
 from django.db import transaction
 from apps.game.models import Player
-from django.db.models import Q
 from apps.mediation.models import Mediator
 from apps.billing.serializers import WalletSerializer
+from rest_framework.permissions import IsAuthenticated
+from apps.betting.permissions import IsPlayer
 
 
 # betting/views.py
-
-
-class BetCreateView(APIView):
+class CreateBetView(APIView):
     serializer_class = BetSerializer
     throttle_classes = [UserRateThrottle]
+    # permission_classes = [IsAuthenticated, IsPlayer]
 
     @extend_schema(
-        summary="Create a new match",
-        description="Create a new match with two players and a mediator.",
+        summary="Create a new bet",
+        description="Create a new bet with a specified amount and game.",
     )
     def post(self, request):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(
+            data=request.data, context={"request": request}
+        )
         try:
-            with transaction.atomic():
-                if serializer.is_valid(raise_exception=True):
-                    amount = serializer.validated_data["amount"]
-                    game = serializer.validated_data["game"]
+            if serializer.is_valid(raise_exception=True):
+                amount = serializer.validated_data["amount"]
+                game = serializer.validated_data["game"]
 
-                    # Find two available players dynamically based on criteria
-                    available_players = Player.objects.filter(
-                        amount=amount, game=game, is_engaged=False
+                # Deduct amount from the user's wallet
+                user = request.user
+                user_wallet = user.wallet
+                if user_wallet.balance < amount:
+                    return CustomResponse.error(
+                        {"error": "Insufficient balance."}, status=400
                     )
+                user_wallet.balance -= amount
+                user_wallet.save()
 
-                    available_mediator = Mediator.objects.filter(
-                        is_engaged=False
-                    ).first()
+                # Create the bet
+                serializer.save()
 
-                    # Check if there are available players and a mediator
-                    if available_players.exists() and available_mediator:
-                        # Select two random players
-                        players = available_players.order_by("?")[:2]
+                # Set is_active to True for the player
+                user.player.is_active = True
+                user.player.save()
 
-                        # Create the match
-                        match = Match.objects.create(
-                            player_1=players[0],
-                            player_2=players[1],
-                            mediator=available_mediator,
-                            amount=amount,
-                            game=game,
-                            is_occupied=True,
-                        )
+                return CustomResponse.success(serializer.data, status=201)
+            else:
+                return CustomResponse.error({"error": "Invalid data."}, status=400)
 
-                        # Update players and mediator to be engaged
-                        players.update(is_engaged=True)
-                        available_mediator.is_engaged = True
-                        available_mediator.save()
-
-                        return CustomResponse.success(
-                            self.serializer_class(match).data, status=201
-                        )
-                    else:
-                        return CustomResponse.error(
-                            {"error": "No available players or mediator."}, status=400
-                        )
-
-                return CustomResponse.error(serializer.errors, status=400)
         except Exception as e:
             return CustomResponse.error({"error": str(e)}, status=500)
 
 
 class BetDetailView(APIView):
     serializer_class = BetSerializer
+
+    @extend_schema(
+        summary="Get a match",
+        description="Get a match with the player_1, player_2, and mediator.",
+    )
+    def get(self, request, pk):
+        try:
+            match = Bet.objects.get(pk=pk)
+            serializer = self.serializer_class(match)
+            return CustomResponse.success(serializer.data, status=200)
+
+        except Match.DoesNotExist:
+            return CustomResponse.error("Match does not exist", status=404)
+
+
+class BetListView(APIView):
+    serializer_class = BetSerializer
+
+    @extend_schema(
+        summary="Available matches", description="Get the list of all available matches"
+    )
+    def get(self, request):
+        matches = Bet.objects.all()
+        serializer = self.serializer_class(matches, many=True)
+        if serializer.is_valid(raise_exception=True):
+            return CustomResponse.success(serializer.data, status=200)
+        return CustomResponse.error(serializer.errors, status=404)
+
+
+class DeleteBetView(APIView):
+    serializer_class = BetSerializer
+
+    @extend_schema(
+        summary="Delete a bet",
+        description="Delete a bet with the specified id.",
+    )
+    def delete(self, request, pk):
+        try:
+            bet = Bet.objects.get(pk=pk)
+            bet.delete()
+            return CustomResponse.success("Bet deleted successfully.", status=200)
+        except Bet.DoesNotExist:
+            return CustomResponse.error("Bet does not exist", status=404)
+
+
+class CreateMatchView(APIView):
+    serializer_class = MatchSerializer
+    throttle_classes = [UserRateThrottle]
+    # permission_classes = [IsAuthenticated, IsPlayer]
+
+    @extend_schema(
+        summary="Create a new match",
+        description="Create a new match with two players and a mediator.",
+    )
+    def post(self, request):
+        serializer = self.serializer_class(
+            data=request.data, context={"request": request}
+        )
+        try:
+            if serializer.is_valid(raise_exception=True):
+                amount = serializer.validated_data["amount"]
+                game = serializer.validated_data["game"]
+
+                # Find two available players dynamically based on criteria
+                available_players = Player.objects.filter(
+                    amount=amount, game=game, is_active=True
+                )
+
+                # Find an available mediator
+                available_mediator = Mediator.objects.filter(is_active=False).first()
+
+                # Check if there are available players and a mediator
+                if available_players.exists() and available_mediator:
+                    # Select two random players
+                    players = available_players.order_by("?")[:2]
+
+                    # Create the match
+                    match = Match.objects.create(
+                        player_1=players[0],
+                        player_2=players[1],
+                        mediator=available_mediator,
+                        amount=amount,
+                        game=game,
+                        is_active=True,
+                    )
+
+                    # Update players and mediator to be engaged
+                    players.update(is_active=True)
+                    available_mediator.is_active = True
+                    available_mediator.is_active = True
+                    available_mediator.save()
+
+                    return CustomResponse.success(
+                        self.serializer_class(match).data, status=201
+                    )
+                else:
+                    return CustomResponse.error(
+                        {"error": "No available players or mediator."}, status=400
+                    )
+
+            return CustomResponse.error(serializer.errors, status=400)
+        except Exception as e:
+            return CustomResponse.error({"error": str(e)}, status=500)
+
+
+class MatchDetailView(APIView):
+    serializer_class = MatchSerializer
 
     @extend_schema(
         summary="Get a match",
@@ -94,18 +185,53 @@ class BetDetailView(APIView):
             return CustomResponse.error("Match does not exist", status=404)
 
 
-class BetListView(APIView):
-    serializer_class = BetSerializer
+class MatchListView(APIView):
+    serializer_class = MatchSerializer
 
     @extend_schema(
         summary="Available matches", description="Get the list of all available matches"
     )
     def get(self, request):
-        matches = Match.objects.all()
+        matches = Match.objects.filter(is_active=True)
         serializer = self.serializer_class(matches, many=True)
         if serializer.is_valid(raise_exception=True):
             return CustomResponse.success(serializer.data, status=200)
         return CustomResponse.error(serializer.errors, status=404)
+
+
+class UpdateMatchView(APIView):
+    serializer_class = MatchSerializer
+
+    @extend_schema(
+        summary="Update a match",
+        description="Update a match with the specified id.",
+    )
+    def put(self, request, pk):
+        try:
+            match = Match.objects.get(pk=pk)
+            serializer = self.serializer_class(match, data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return CustomResponse.success(serializer.data, status=200)
+            return CustomResponse.error(serializer.errors, status=400)
+        except Match.DoesNotExist:
+            return CustomResponse.error("Match does not exist", status=404)
+
+
+class DeleteMatchView(APIView):
+    serializer_class = MatchSerializer
+
+    @extend_schema(
+        summary="Delete a match",
+        description="Delete a match with the specified id.",
+    )
+    def delete(self, request, pk):
+        try:
+            match = Match.objects.get(pk=pk)
+            match.delete()
+            return CustomResponse.success("Match deleted successfully.", status=200)
+        except Match.DoesNotExist:
+            return CustomResponse.error("Match does not exist", status=404)
 
 
 class ConfirmOutcomeView(APIView):
@@ -132,9 +258,9 @@ class ConfirmOutcomeView(APIView):
                         match.save()
 
                         # Update the players and mediator
-                        match.player_1.is_engaged = False
-                        match.player_2.is_engaged = False
-                        match.mediator.is_engaged = False
+                        match.player_1.is_active = False
+                        match.player_2.is_active = False
+                        match.mediator.is_active = False
 
                         # Determine the amounts based on your specified rules
                         winner_amount = match.amount + 0.8 * match.player_2.amount
