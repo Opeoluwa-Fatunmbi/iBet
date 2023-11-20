@@ -20,7 +20,7 @@ from apps.billing.serializers import WalletSerializer
 
 
 class BetCreateView(APIView):
-    serializer_class = CreateMatchSerializer
+    serializer_class = BetSerializer
     throttle_classes = [UserRateThrottle]
 
     @extend_schema(
@@ -78,7 +78,7 @@ class BetCreateView(APIView):
 
 
 class BetDetailView(APIView):
-    serializer_class = MatchSerializer
+    serializer_class = BetSerializer
 
     @extend_schema(
         summary="Get a match",
@@ -95,7 +95,7 @@ class BetDetailView(APIView):
 
 
 class BetListView(APIView):
-    serializer_class = MatchSerializer
+    serializer_class = BetSerializer
 
     @extend_schema(
         summary="Available matches", description="Get the list of all available matches"
@@ -126,7 +126,7 @@ class ConfirmOutcomeView(APIView):
                     match = Match.objects.get(pk=pk)
 
                     # Ensure that the match is not already confirmed
-                    if match.status == Match.MATCH_STATUS_CHOICES.PENDING:
+                    if match.status == Match.MATCH_STATUS_CHOICES.IN_PROGRESS:
                         # Update the match status
                         match.status = Match.MATCH_STATUS_CHOICES.COMPLETED
                         match.save()
