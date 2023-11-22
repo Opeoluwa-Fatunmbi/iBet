@@ -1,7 +1,6 @@
 from rest_framework.views import APIView
 from apps.betting.models import Match, Bet, Outcome
 from .serializers import (
-    CreateMatchSerializer,
     BetSerializer,
     OutcomeSerializer,
     MatchSerializer,
@@ -111,7 +110,7 @@ class DeleteBetView(APIView):
 class CreateMatchView(APIView):
     serializer_class = MatchSerializer
     throttle_classes = [UserRateThrottle]
-    # permission_classes = [IsAuthenticated, IsPlayer]
+    permission_classes = [IsAuthenticated, IsPlayer]
 
     @extend_schema(
         summary="Create a new match",
@@ -187,6 +186,7 @@ class MatchDetailView(APIView):
 
 class MatchListView(APIView):
     serializer_class = MatchSerializer
+    throttle_classes = [UserRateThrottle]
 
     @extend_schema(
         summary="Available matches", description="Get the list of all available matches"
@@ -201,6 +201,7 @@ class MatchListView(APIView):
 
 class UpdateMatchView(APIView):
     serializer_class = MatchSerializer
+    throttle_classes = [UserRateThrottle]
 
     @extend_schema(
         summary="Update a match",
@@ -236,99 +237,136 @@ class DeleteMatchView(APIView):
 
 class ConfirmOutcomeView(APIView):
     serializer_class = OutcomeSerializer
+    throttle_classes = [UserRateThrottle]
 
     @extend_schema(
         summary="Confirm outcome",
-        description="Confirm the outcome of a match and update the players and mediator.",
+        description="Confirm the outcome of a match.",
     )
     def post(self, request, pk):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(
+            data=request.data, context={"request": request}
+        )
         try:
-            with transaction.atomic():
-                if serializer.is_valid(raise_exception=True):
-                    winner = serializer.validated_data["winner"]
-                    loser = serializer.validated_data["loser"]
+            if serializer.is_valid(raise_exception=True):
+                match = Match.objects.get(pk=pk)
+                winner = serializer.validated_data["winner"]
 
-                    match = Match.objects.get(pk=pk)
-
-                    # Ensure that the match is not already confirmed
-                    if match.status == Match.MATCH_STATUS_CHOICES.IN_PROGRESS:
-                        # Update the match status
-                        match.status = Match.MATCH_STATUS_CHOICES.COMPLETED
+                # Check if the match is active
+                if match.is_active:
+                    # Check if the winner is one of the players
+                    if (
+                        match.player_1.user.username == winner
+                        or match.player_2.user.username == winner
+                    ):
+                        # Update the match status to completed
+                        match.MATCH_STATUS_CHOICES = "COMPLETED"
                         match.save()
 
-                        # Update the players and mediator
+                        # Update the winner's wallet balance
+                        winner_wallet = match.winner.wallet
+                        winner_wallet.balance += match.amount
+                        winner_wallet.save()
+
+                        # Update the loser's wallet balance
+                        loser = (
+                            match.player_1.user.username
+                            if match.player_2.user.username == winner
+                            else match.player_2.user.username
+                        )
+                        loser_wallet = match.loser.wallet
+                        loser_wallet.balance -= match.amount
+                        loser_wallet.save()
+
+                        # Update the players and mediator to be available
                         match.player_1.is_active = False
                         match.player_2.is_active = False
                         match.mediator.is_active = False
-
-                        # Determine the amounts based on your specified rules
-                        winner_amount = match.amount + 0.8 * match.player_2.amount
-                        loser_amount = 0.2 * match.player_2.amount
-                        mediator_amount = 0.1 * match.amount
-
-                        # Update the winner's amount
-                        match.player_1.amount += winner_amount
-
-                        # Update the loser's amount
-                        match.player_2.amount -= loser_amount
-
-                        # Update the mediator's amount
-                        match.mediator.amount += mediator_amount
-
-                        # Save the players and mediator
                         match.player_1.save()
                         match.player_2.save()
                         match.mediator.save()
 
-                        # Optionally, update wallet balances
-                        winner_wallet_serializer = WalletSerializer(
-                            match.player_1.wallet,
-                            data={"balance": match.player_1.amount},
-                        )
-                        if winner_wallet_serializer.is_valid():
-                            winner_wallet_serializer.save()
+                        # Create the outcome
+                        serializer.save(match=match)
 
-                        loser_wallet_serializer = WalletSerializer(
-                            match.player_2.wallet,
-                            data={"balance": match.player_2.amount},
-                        )
-                        if loser_wallet_serializer.is_valid():
-                            loser_wallet_serializer.save()
-
-                        mediator_wallet_serializer = WalletSerializer(
-                            match.mediator.wallet,
-                            data={"balance": match.mediator.amount},
-                        )
-                        if mediator_wallet_serializer.is_valid():
-                            mediator_wallet_serializer.save()
-
-                        return CustomResponse.success(
-                            self.serializer_class(match).data, status=200
-                        )
+                        return CustomResponse.success(serializer.data, status=201)
                     else:
                         return CustomResponse.error(
-                            {"error": "Match outcome already confirmed."}, status=400
+                            {"error": "Winner is not one of the players."}, status=400
                         )
+                else:
+                    return CustomResponse.error(
+                        {"error": "Match is not active."}, status=400
+                    )
 
-                return CustomResponse.error(serializer.errors, status=400)
+            return CustomResponse.error(serializer.errors, status=400)
         except Exception as e:
             return CustomResponse.error({"error": str(e)}, status=500)
 
 
 class ListOutcomesView(APIView):
     serializer_class = OutcomeSerializer
+    throttle_classes = [UserRateThrottle]
 
     @extend_schema(
         summary="List outcomes",
-        description="List all outcomes for a match.",
+        description="List all outcomes.",
+    )
+    def get(self, request):
+        outcomes = Outcome.objects.all()
+        serializer = self.serializer_class(outcomes, many=True)
+        if serializer.is_valid(raise_exception=True):
+            return CustomResponse.success(serializer.data, status=200)
+        return CustomResponse.error(serializer.errors, status=404)
+
+
+class OutcomeDetailView(APIView):
+    serializer_class = OutcomeSerializer
+
+    @extend_schema(
+        summary="Get an outcome",
+        description="Get an outcome with the match, winner, and loser.",
     )
     def get(self, request, pk):
         try:
-            match = Match.objects.get(pk=pk)
-            outcomes = Outcome.objects.filter(match=match)
-            serializer = self.serializer_class(outcomes, many=True)
+            outcome = Outcome.objects.get(pk=pk)
+            serializer = self.serializer_class(outcome)
             return CustomResponse.success(serializer.data, status=200)
 
-        except Match.DoesNotExist:
-            return CustomResponse.error("Match does not exist", status=404)
+        except Outcome.DoesNotExist:
+            return CustomResponse.error("Outcome does not exist", status=404)
+
+
+class UpdateOutcomeView(APIView):
+    serializer_class = OutcomeSerializer
+
+    @extend_schema(
+        summary="Update an outcome",
+        description="Update an outcome with the specified id.",
+    )
+    def put(self, request, pk):
+        try:
+            outcome = Outcome.objects.get(pk=pk)
+            serializer = self.serializer_class(outcome, data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return CustomResponse.success(serializer.data, status=200)
+            return CustomResponse.error(serializer.errors, status=400)
+        except Outcome.DoesNotExist:
+            return CustomResponse.error("Outcome does not exist", status=404)
+
+
+class DeleteOutcomeView(APIView):
+    serializer_class = OutcomeSerializer
+
+    @extend_schema(
+        summary="Delete an outcome",
+        description="Delete an outcome with the specified id.",
+    )
+    def delete(self, request, pk):
+        try:
+            outcome = Outcome.objects.get(pk=pk)
+            outcome.delete()
+            return CustomResponse.success("Outcome deleted successfully.", status=200)
+        except Outcome.DoesNotExist:
+            return CustomResponse.error("Outcome does not exist", status=404)
