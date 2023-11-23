@@ -64,10 +64,8 @@ Before you proceed, make sure you have the following installed on your system:
 
 iBet API comes with built-in documentation powered by DRF-YASG. You can explore and test the API using Swagger and ReDoc.
 
-- Swagger UI: To view and interact with the API using Swagger UI, go to `http://127.0.0.1:8000/swagger/` in your web browser.
+- Swagger UI: To view and interact with the API using Swagger UI, go to `http://127.0.0.1:8000/api/swagger/` in your web browser.
 
-- ReDoc: For a more user-friendly API documentation interface, navigate to `http://127.0.0.1:8000/redoc/` in your web browser.
+- ReDoc: For a more user-friendly API documentation interface, navigate to `http://127.0.0.1:8000/api/redoc/` in your web browser.
 
 Feel free to explore the available endpoints, request formats, and responses to understand how to use the iBet API effectively.
-
-That's it! You now have the iBet API up and running on your local server. Have fun developing and exploring the exciting world of iMessage game betting! If you encounter any issues or have questions, please refer to the project's GitHub repository for further assistance.
