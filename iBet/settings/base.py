@@ -35,10 +35,8 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    "adrf",
     "cloudinary",
     "corsheaders",
-    # "defender",
     "drf_spectacular",
     "gunicorn",
     "rest_framework",

@@ -20,8 +20,7 @@ cryptography==41.0.2
 cssselect2==0.7.0
 defusedxml==0.7.1
 distlib==0.3.6
-Django==4.2.6
-django-admin-sortable2==1.0.4
+Django>=2.2,<4.3
 django-angular==2.3
 django-appconf==1.0.5
 django-autoslug==1.9.9
