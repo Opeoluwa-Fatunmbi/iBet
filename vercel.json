@@ -20,7 +20,7 @@
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "iBet/asgi.py"
+            "dest": "iBet/wsgi.py"
         }
     ]
 }
